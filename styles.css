@@ -47,8 +47,20 @@ main {
   justify-content: center;
 }
 
-table {
-    overflow: auto;
+.table {
+  width: 100%;
+  overflow: auto;
+}
+.table table {
+  width: 100%;
+  border: 2px solid var(--slate-200);
+}
+
+td,
+th {
+  text-align: center;
+  padding: 0.5rem;
+  border-bottom: 2px solid var(--slate-200);
 }
 
 .prose {
