@@ -25,7 +25,6 @@ body {
 
 /* Sidebar: Fixed position on Desktop */
 .sidebar {
-  /* width: var(--sidebar-width); */
   height: 100vh;
   position: fixed;
   left: 0;
@@ -155,6 +154,7 @@ small {
   font-weight: bold;
   text-decoration: none;
 }
+
 /* Container for the toggle button */
 .menu-toggle {
   background: transparent;
@@ -184,9 +184,7 @@ small {
   display: block;
   height: 2px;
   width: 100%;
-  background-color: var(
-    --accent
-  ); /* Choose a techy color like neon green/cyan */
+  background-color: var(--accent); /* Techy accent color */
   border-radius: 0.5rem;
   transition: all 0.4s cubic-bezier(0.68, -0.6, 0.32, 1.6); /* Bouncy/mechanical feel */
   transform-origin: center;
