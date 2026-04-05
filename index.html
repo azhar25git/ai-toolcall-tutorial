@@ -1,1026 +1,1191 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
-
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Function Calling Tutorial</title>
+    <title>Function Calling Tutorial - Complete Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <link rel="stylesheet" href="styles.css">
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #1e40af;
+            --secondary: #8b5cf6;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --gray-50: #f9fafb;
+            --gray-100: #f3f4f6;
+            --gray-200: #e5e7eb;
+            --gray-300: #d1d5db;
+            --gray-600: #4b5563;
+            --gray-700: #374151;
+            --gray-900: #111827;
+            --text: #1f2937;
+            --text-light: #6b7280;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text);
+            background-color: var(--gray-50);
+            padding: 0;
+            margin: 0;
+        }
+
+        /* Header & Navigation */
+        header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 1.5rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        header h1 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+            font-weight: 700;
+        }
+
+        header p {
+            font-size: 0.85rem;
+            opacity: 0.9;
+        }
+
+        /* Main Content */
+        main {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 0;
+        }
+
+        .container {
+            padding: 1.5rem 1rem;
+        }
+
+        /* Table of Contents */
+        .toc {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            margin: 1.5rem 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .toc h2 {
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .toc ol {
+            list-style: none;
+            counter-reset: item;
+        }
+
+        .toc li {
+            counter-increment: item;
+            margin-bottom: 0.75rem;
+        }
+
+        .toc a {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            display: block;
+            padding: 0.5rem;
+            border-radius: 6px;
+            transition: all 0.2s;
+        }
+
+        .toc a:active,
+        .toc a:hover {
+            background-color: var(--gray-100);
+            color: var(--primary-dark);
+        }
+
+        .toc a::before {
+            content: counter(item) ". ";
+            font-weight: 700;
+            color: var(--secondary);
+        }
+
+        /* Sections */
+        section {
+            background: white;
+            margin: 1.5rem 1rem;
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        section h2 {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            padding-bottom: 1rem;
+            border-bottom: 3px solid var(--primary);
+        }
+
+        section h3 {
+            font-size: 1.1rem;
+            color: var(--text);
+            margin-top: 1.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        section h4 {
+            font-size: 1rem;
+            color: var(--gray-700);
+            margin-top: 1rem;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+        }
+
+        /* Text Content */
+        p {
+            margin-bottom: 1rem;
+            color: var(--text);
+            font-size: 0.95rem;
+        }
+
+        strong {
+            font-weight: 600;
+            color: var(--text);
+        }
+
+        /* Lists */
+        ul, ol {
+            margin-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
+        ul li, ol li {
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+
+        /* Code Blocks */
+        code {
+            font-family: "Courier New", Courier, monospace;
+            background-color: var(--gray-100);
+            padding: 0.2em 0.4em;
+            border-radius: 4px;
+            font-size: 0.85rem;
+            color: var(--danger);
+        }
+
+        pre {
+            background-color: var(--gray-200);
+            color: #e0e0e0;
+            padding: 1rem;
+            border-radius: 8px;
+            overflow-x: auto;
+            margin: 1rem 0;
+            font-size: 0.85rem;
+            line-height: 1.4;
+        }
+
+        pre code {
+            background: none;
+            color: var(--text);
+            padding: 0;
+            border-radius: 0;
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.75rem;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 0.75rem;
+            border-bottom: 1px solid var(--gray-200);
+        }
+
+        tr:nth-child(even) {
+            background-color: var(--gray-50);
+        }
+
+        tr:hover {
+            background-color: rgba(59, 130, 246, 0.05);
+        }
+
+        /* Cards & Callouts */
+        .card {
+            border-left: 4px solid var(--primary);
+            padding: 1rem;
+            margin: 1rem 0;
+            border-radius: 6px;
+            background-color: var(--gray-50);
+        }
+
+        .card.success {
+            border-left-color: var(--success);
+            background-color: #f0fdf4;
+        }
+
+        .card.danger {
+            border-left-color: var(--danger);
+            background-color: #fef2f2;
+        }
+
+        .card.warning {
+            border-left-color: var(--warning);
+            background-color: #fffbeb;
+        }
+
+        .card h4 {
+            margin-top: 0;
+            color: inherit;
+        }
+
+        .example {
+            background-color: #f0f9ff;
+            border-left: 4px solid var(--secondary);
+            padding: 1rem;
+            border-radius: 6px;
+            margin: 1rem 0;
+            font-size: 0.9rem;
+        }
+
+        .example-title {
+            font-weight: 700;
+            color: var(--secondary);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Checklist */
+        .checklist {
+            list-style: none;
+            margin: 1rem 0;
+        }
+
+        .checklist li {
+            padding: 0.75rem;
+            margin-bottom: 0.5rem;
+            background-color: var(--gray-50);
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .checklist li::before {
+            content: "☐";
+            font-weight: bold;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+
+        /* Inline Badges */
+        .badge {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin: 0.25rem;
+        }
+
+        .badge.correct {
+            background-color: #d1fae5;
+            color: var(--success);
+        }
+
+        .badge.wrong {
+            background-color: #fee2e2;
+            color: var(--danger);
+        }
+
+        /* Comparison Layout */
+        .comparison {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        @media (max-width: 640px) {
+            .comparison {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .comparison-item {
+            padding: 1rem;
+            border-radius: 8px;
+            border: 2px solid var(--gray-200);
+        }
+
+        .comparison-item.wrong {
+            border-color: var(--danger);
+            background-color: rgba(239, 68, 68, 0.05);
+        }
+
+        .comparison-item.correct {
+            border-color: var(--success);
+            background-color: rgba(16, 185, 129, 0.05);
+        }
+
+        .comparison-label {
+            font-weight: 700;
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .comparison-item.wrong .comparison-label {
+            color: var(--danger);
+        }
+
+        .comparison-item.correct .comparison-label {
+            color: var(--success);
+        }
+
+        /* Steps */
+        .steps {
+            counter-reset: step;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .step {
+            counter-increment: step;
+            padding: 1.5rem;
+            background-color: var(--gray-50);
+            border-radius: 8px;
+            border-left: 4px solid var(--secondary);
+        }
+
+        .step::before {
+            content: "Step " counter(step);
+            display: block;
+            font-weight: 700;
+            color: var(--secondary);
+            font-size: 0.9rem;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Tool Category Grid */
+        .tool-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .tool-card {
+            padding: 1rem;
+            border-radius: 8px;
+            background-color: var(--gray-50);
+            border: 2px solid var(--gray-200);
+        }
+
+        .tool-card h4 {
+            margin-top: 0;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .tool-card p {
+            font-size: 0.85rem;
+            margin: 0;
+            color: var(--text-light);
+        }
+
+        /* Footer */
+        footer {
+            background-color: var(--gray-900);
+            color: white;
+            text-align: center;
+            padding: 2rem 1rem;
+            margin-top: 2rem;
+        }
+
+        footer p {
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Responsive Typography */
+        @media (max-width: 640px) {
+            header h1 {
+                font-size: 1.25rem;
+            }
+
+            section {
+                margin: 1rem 0;
+                padding: 1rem;
+            }
+
+            section h2 {
+                font-size: 1.25rem;
+                margin-bottom: 1rem;
+            }
+
+            section h3 {
+                font-size: 1rem;
+            }
+
+            table {
+                font-size: 0.85rem;
+            }
+
+            th, td {
+                padding: 0.5rem;
+            }
+
+            pre {
+                padding: 0.75rem;
+                font-size: 0.75rem;
+            }
+        }
+
+        /* Smooth Transitions */
+        a {
+            transition: all 0.2s ease;
+        }
+
+        button {
+            transition: all 0.2s ease;
+        }
+
+        /* Print Styles */
+        @media print {
+            header {
+                position: static;
+            }
+
+            section {
+                page-break-inside: avoid;
+                box-shadow: none;
+                border: 1px solid var(--gray-200);
+            }
+        }
+
+        /* Utility Classes */
+        .divider {
+            height: 2px;
+            background: linear-gradient(90deg, transparent, var(--gray-300), transparent);
+            margin: 2rem 0;
+            border: none;
+        }
+
+        .highlight {
+            background-color: #fef3c7;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-weight: 500;
+        }
+
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border-width: 0;
+        }
+    </style>
 </head>
-
-<body x-data="docState">
-    <header id="header">
-        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle Menu">
-            <div class="hamburger">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </button>
-        <div>AI Function Calling Tutorial</div>
+<body>
+    <header>
+        <h1>📚 Function Calling Tutorial</h1>
+        <p>Complete Guide to Tool Selection & Payload Construction</p>
     </header>
 
     <main>
-        <nav class="sidebar" id="sidebar">
-
-            <h4 class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-4">Course Content</h4>
-
-            <a href="#part-1-fundamentals-of-function-calling" class="nav-link"
-                :class="{ 'active': activeSection === 'part-1-fundamentals-of-function-calling' }">1.
-                Fundamentals</a>
-            <a href="#part-2-core-concepts-in-function-calling" class="nav-link"
-                :class="{ 'active': activeSection === 'part-2-core-concepts-in-function-calling' }">2. Core
-                Concepts</a>
-            <a href="#part-3-the-function-calling-workflow" class="nav-link"
-                :class="{ 'active': activeSection === 'part-3-the-function-calling-workflow' }">3. Workflow</a>
-            <a href="#part-4-common-function-calling-patterns" class="nav-link"
-                :class="{ 'active': activeSection === 'part-4-common-function-calling-patterns' }">4. Common
-                Patterns</a>
-            <a href="#part-5-type-system-and-parameter-validation" class="nav-link"
-                :class="{ 'active': activeSection === 'part-5-type-system-and-parameter-validation' }">5. Type
-                Systems</a>
-            <a href="#part-6-evaluation-criteria-for-function-calling-tests" class="nav-link"
-                :class="{ 'active': activeSection === 'part-6-evaluation-criteria-for-function-calling-tests' }">6.
-                Evaluation Criteria</a>
-            <a href="#part-7-real-world-test-scenarios" class="nav-link"
-                :class="{ 'active': activeSection === 'part-7-real-world-test-scenarios' }">7. Real-World
-                Scenarios</a>
-            <a href="#part-8-common-mistakes-and-how-to-avoid-them" class="nav-link"
-                :class="{ 'active': activeSection === 'part-8-common-mistakes-and-how-to-avoid-them' }">8. Common
-                Mistakes</a>
-            <a href="#part-9-advanced-topics" class="nav-link"
-                :class="{ 'active': activeSection === 'part-9-advanced-topics' }">9. Advanced Topics</a>
-            <a href="#part-10-testing-yourself" class="nav-link"
-                :class="{ 'active': activeSection === 'part-10-testing-yourself' }">10. Testing Yourself</a>
-            <a href="#part-11-preparation-strategies" class="nav-link"
-                :class="{ 'active': activeSection === 'part-11-preparation-strategies' }">11. Prep Strategies</a>
-            <a href="#part-12-quick-reference-checklist" class="nav-link"
-                :class="{ 'active': activeSection === 'part-12-quick-reference-checklist' }">12. Quick Checklist</a>
-
-        </nav>
-        <article class="prose">
-            <h1 id="complete-tutorial-ai-function-calling-tests">AI Function Calling Tutorial</h1>
-            <h2 id="understanding-function-calling-in-ai-development">Understanding Function Calling in AI
-                Development</h2>
-            <p>Function calling is a critical capability in modern AI systems. It enables LLMs to invoke external
-                tools, APIs, and
-                functions to accomplish tasks beyond pure text generation. This tutorial covers everything you need
-                to understand
-                and master function calling tests.</p>
-            <hr>
-            <h2 id="part-1-fundamentals-of-function-calling">Part 1: Fundamentals of Function Calling</h2>
-            <h3 id="what-is-function-calling-">What is Function Calling?</h3>
-            <p>Function calling is the mechanism by which an AI model can:</p>
+        <!-- Table of Contents -->
+        <div class="toc">
+            <h2>📋 Table of Contents</h2>
             <ol>
-                <li><strong>Recognize</strong> when it needs external functionality</li>
-                <li><strong>Identify</strong> which tool/function is most appropriate</li>
-                <li><strong>Structure</strong> the correct parameters/payload</li>
-                <li><strong>Execute</strong> the call with proper error handling</li>
+                <li><a href="#fundamentals">Fundamentals</a></li>
+                <li><a href="#core-concepts">Core Concepts</a></li>
+                <li><a href="#tool-selection">Tool Selection</a></li>
+                <li><a href="#payload-construction">Payload Construction</a></li>
+                <li><a href="#common-mistakes">Common Mistakes</a></li>
+                <li><a href="#practice-examples">Practice Examples</a></li>
+                <li><a href="#assessment-strategy">Assessment Strategy</a></li>
             </ol>
-            <h3 id="why-function-calling-matters">Why Function Calling Matters</h3>
-            <p>Modern AI applications depend on function calling for:</p>
+        </div>
+
+        <!-- Section 1: Fundamentals -->
+        <section id="fundamentals">
+            <h2>1️⃣ Fundamentals</h2>
+
+            <h3>What is Function Calling?</h3>
+            <p>Function calling (also called "tool use") is the ability to invoke external tools or APIs to perform actions beyond generating text. Instead of just answering with words, an AI can call functions with specific parameters.</p>
+
+            <h3>Why Function Calling Matters</h3>
             <ul>
-                <li><strong>Integration</strong>: Connect AI to real systems (databases, APIs, external services)
-                </li>
-                <li><strong>Accuracy</strong>: Access current data (weather, stock prices, databases)</li>
-                <li><strong>Control</strong>: Ensure deterministic outcomes (structured outputs)</li>
-                <li><strong>Safety</strong>: Validate inputs before execution</li>
-                <li><strong>Auditing</strong>: Track what tools were called and why</li>
+                <li><strong>Accuracy:</strong> Executes exact operations rather than describing them</li>
+                <li><strong>Integration:</strong> Connects AI with real systems</li>
+                <li><strong>Dynamic Responses:</strong> Adapts behavior based on tool results</li>
+                <li><strong>Reliability:</strong> Reduces hallucination by delegating to trusted tools</li>
             </ul>
-            <h3 id="real-world-analogy">Real-World Analogy</h3>
-            <p>Think of it like calling a friend for a specific favor:</p>
-            <ul>
-                <li>You <strong>recognize</strong> the need (I need a phone number)</li>
-                <li>You <strong>identify</strong> the right person (Sarah has good contacts)</li>
-                <li>You <strong>provide details</strong> (Tell me Jeff&#39;s number - he&#39;s in tech)</li>
-                <li>They <strong>execute</strong> the request (looks in contacts, returns number)</li>
-            </ul>
-            <hr>
-            <h2 id="part-2-core-concepts-in-function-calling">Part 2: Core Concepts in Function Calling</h2>
-            <h3 id="2-1-functions-vs-tools">2.1 Functions vs Tools</h3>
-            <p>In AI contexts, these terms are used interchangeably:</p>
-            <ul>
-                <li><strong>Function</strong>: A callable unit with defined inputs/outputs</li>
-                <li><strong>Tool</strong>: A capability the AI can use</li>
-                <li><strong>Skill</strong>: A complex tool with multiple sub-functions</li>
-                <li><strong>Plugin</strong>: Extended functionality via external libraries</li>
-            </ul>
-            <h3 id="2-2-anatomy-of-a-function-definition">2.2 Anatomy of a Function Definition</h3>
-            <p>Every function requires:</p>
-            <pre><code><span class="hljs-function"><span class="hljs-keyword">FUNCTION</span> <span class="hljs-title">SCHEMA</span>:</span>
-        ├── <span class="hljs-keyword">Name</span>: Unique identifier (snake_case, no spaces)
-        ├── Description: What it does (<span class="hljs-number">2</span>-<span class="hljs-number">3</span> sentences, human-readable)
-        ├── Parameters:
-        │   ├── <span class="hljs-keyword">Type</span>: <span class="hljs-keyword">Object</span> containing properties
-        │   ├── Properties: Input fields <span class="hljs-keyword">with</span>:
-        │   │   ├── <span class="hljs-keyword">Name</span>: Parameter <span class="hljs-keyword">name</span>
-        │   │   ├── <span class="hljs-keyword">Type</span>: Data <span class="hljs-keyword">type</span> (<span class="hljs-keyword">string</span>, number, boolean, <span class="hljs-keyword">array</span>, <span class="hljs-keyword">object</span>)
-        │   │   ├── Description: What this parameter means
-        │   │   └── Required: Yes/No
-        │   └── Required Fields: List <span class="hljs-keyword">of</span> mandatory parameters
-        └── Return <span class="hljs-keyword">Type</span>: What the <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">outputs</span></span>
-        </code></pre>
-            <h3 id="2-3-example-function-definition">2.3 Example Function Definition</h3>
-            <pre><code class="lang-json">{
-          <span class="hljs-attr">"name"</span>: <span class="hljs-string">"send_email"</span>,
-          <span class="hljs-attr">"description"</span>: <span class="hljs-string">"Send an email to a recipient with subject and body"</span>,
-          <span class="hljs-attr">"parameters"</span>: {
-            <span class="hljs-attr">"type"</span>: <span class="hljs-string">"object"</span>,
-            <span class="hljs-attr">"properties"</span>: {
-              <span class="hljs-attr">"recipient"</span>: {
-                <span class="hljs-attr">"type"</span>: <span class="hljs-string">"string"</span>,
-                <span class="hljs-attr">"description"</span>: <span class="hljs-string">"Email address of the recipient"</span>
-              },
-              <span class="hljs-attr">"subject"</span>: {
-                <span class="hljs-attr">"type"</span>: <span class="hljs-string">"string"</span>,
-                <span class="hljs-attr">"description"</span>: <span class="hljs-string">"Email subject line"</span>
-              },
-              <span class="hljs-attr">"body"</span>: {
-                <span class="hljs-attr">"type"</span>: <span class="hljs-string">"string"</span>,
-                <span class="hljs-attr">"description"</span>: <span class="hljs-string">"Email message content"</span>
-              },
-              <span class="hljs-attr">"cc"</span>: {
-                <span class="hljs-attr">"type"</span>: <span class="hljs-string">"array"</span>,
-                <span class="hljs-attr">"items"</span>: { <span class="hljs-attr">"type"</span>: <span class="hljs-string">"string"</span> },
-                <span class="hljs-attr">"description"</span>: <span class="hljs-string">"Optional: Email addresses to CC"</span>
-              },
-              <span class="hljs-attr">"priority"</span>: {
-                <span class="hljs-attr">"type"</span>: <span class="hljs-string">"string"</span>,
-                <span class="hljs-attr">"enum"</span>: [<span class="hljs-string">"low"</span>, <span class="hljs-string">"normal"</span>, <span class="hljs-string">"high"</span>],
-                <span class="hljs-attr">"description"</span>: <span class="hljs-string">"Email priority level (default: normal)"</span>
-              }
-            },
-            <span class="hljs-attr">"required"</span>: [<span class="hljs-string">"recipient"</span>, <span class="hljs-string">"subject"</span>, <span class="hljs-string">"body"</span>]
-          }
-        }
-        </code></pre>
-            <hr>
-            <h2 id="part-3-the-function-calling-workflow">Part 3: The Function Calling Workflow</h2>
-            <h3 id="step-1-parse-the-user-request">Step 1: Parse the User Request</h3>
-            <p><strong>Input</strong>: User query or instruction
-                <strong>Task</strong>: Understand what the user wants
-            </p>
-            <pre><code>USER REQUEST: "Schedule a meeting with Sarah for next Tuesday at 2 PM about Q1 planning"
-        
-        ANALYSIS:
-        -<span class="ruby"> Action <span class="hljs-symbol">needed:</span> Schedule/create event
-        </span>-<span class="ruby"> <span class="hljs-symbol">Who:</span> Sarah
-        </span>-<span class="ruby"> <span class="hljs-symbol">When:</span> Next Tuesday, <span class="hljs-number">2</span> PM
-        </span>-<span class="ruby"> <span class="hljs-symbol">Topic:</span> Q1 planning</span>
-        </code></pre>
-            <h3 id="step-2-identify-available-tools">Step 2: Identify Available Tools</h3>
-            <p><strong>Input</strong>: User intent, system&#39;s available functions
-                <strong>Task</strong>: Determine which tool(s) could help
-            </p>
-            <pre><code>AVAILABLE TOOLS:
-        ✓ create_calendar_event - Right tool! Schedules meetings
-        -<span class="ruby"> send_email - Could notify, but <span class="hljs-keyword">not</span> primary
-        </span>-<span class="ruby"> search_contacts - Not needed (Sarah is named)
-        </span>-<span class="ruby"> get_calendar_availability - Could help, but <span class="hljs-keyword">not</span> primary</span>
-        </code></pre>
-            <h3 id="step-3-map-parameters">Step 3: Map Parameters</h3>
-            <p><strong>Input</strong>: User intent, function parameters
-                <strong>Task</strong>: Extract/infer all required and optional parameters
-            </p>
-            <pre><code>FUNCTION: create_calendar_event
-        Required Parameters:
-          -<span class="ruby"> <span class="hljs-symbol">title:</span> <span class="hljs-string">"Q1 Planning Meeting"</span> ← From user request
-        </span>  -<span class="ruby"> <span class="hljs-symbol">attendees:</span> [<span class="hljs-string">"sarah@company.com"</span>] ← From user request
-        </span>  -<span class="ruby"> <span class="hljs-symbol">start_time:</span> <span class="hljs-string">"2025-04-08T14:00:00"</span> ← Infer <span class="hljs-string">"next Tuesday at 2 PM"</span>
-        </span>  -<span class="ruby"> <span class="hljs-symbol">end_time:</span> <span class="hljs-string">"2025-04-08T15:00:00"</span> ← Default to <span class="hljs-number">1</span> hour
-        </span>
-        Optional Parameters:
-          -<span class="ruby"> <span class="hljs-symbol">description:</span> <span class="hljs-string">""</span> ← Not specified by user
-        </span>  -<span class="ruby"> <span class="hljs-symbol">location:</span> <span class="hljs-string">"virtual"</span> ← Could infer <span class="hljs-keyword">or</span> leave default
-        </span>  -<span class="ruby"> <span class="hljs-symbol">send_invites:</span> <span class="hljs-literal">true</span> ← Reasonable default</span>
-        </code></pre>
-            <h3 id="step-4-construct-the-payload">Step 4: Construct the Payload</h3>
-            <p><strong>Input</strong>: Mapped parameters
-                <strong>Task</strong>: Build the properly-formatted function call
-            </p>
-            <pre><code class="lang-json">{
-          <span class="hljs-attr">"function"</span>: <span class="hljs-string">"create_calendar_event"</span>,
-          <span class="hljs-attr">"parameters"</span>: {
-            <span class="hljs-attr">"title"</span>: <span class="hljs-string">"Q1 Planning Meeting"</span>,
-            <span class="hljs-attr">"attendees"</span>: [<span class="hljs-string">"sarah@company.com"</span>],
-            <span class="hljs-attr">"start_time"</span>: <span class="hljs-string">"2025-04-08T14:00:00"</span>,
-            <span class="hljs-attr">"end_time"</span>: <span class="hljs-string">"2025-04-08T15:00:00"</span>,
-            <span class="hljs-attr">"send_invites"</span>: <span class="hljs-literal">true</span>
-          }
-        }
-        </code></pre>
-            <h3 id="step-5-execute-and-handle-response">Step 5: Execute and Handle Response</h3>
-            <p><strong>Input</strong>: Function call result
-                <strong>Task</strong>: Process the response and communicate back to user
-            </p>
-            <pre><code>RESPONSE FROM SYSTEM:
-        {
-          <span class="hljs-string">"status"</span>: <span class="hljs-string">"success"</span>,
-          <span class="hljs-string">"event_id"</span>: <span class="hljs-string">"evt_12345"</span>,
-          <span class="hljs-string">"message"</span>: <span class="hljs-string">"Meeting scheduled with Sarah for Tuesday, April 8 at 2:00 PM"</span>
-        }
-        
-        AI RESPONSE TO USER:
-        <span class="hljs-comment">"I've scheduled a meeting with Sarah for next Tuesday (April 8) at 2:00 PM to discuss Q1 planning. </span>
-        An invitation <span class="hljs-built_in">has</span> been sent <span class="hljs-keyword">to</span> her.<span class="hljs-comment">"</span>
-        </code></pre>
-            <hr>
-            <h2 id="part-4-common-function-calling-patterns">Part 4: Common Function Calling Patterns</h2>
-            <h3 id="pattern-1-single-tool-direct-execution">Pattern 1: Single Tool, Direct Execution</h3>
-            <pre><code><span class="hljs-symbol">User:</span> <span class="hljs-string">"What's the weather in London?"</span>
-        <span class="hljs-symbol">Analysis:</span> Simple request, one tool needed
-        <span class="hljs-symbol">Tool:</span> weather_api
-        <span class="hljs-symbol">Execution:</span> Straightforward - get current conditions
-        <span class="hljs-symbol">Response:</span> Direct answer
-        </code></pre>
-            <h3 id="pattern-2-tool-selection-among-alternatives">Pattern 2: Tool Selection Among Alternatives</h3>
-            <pre><code><span class="hljs-attribute">User</span>: <span class="hljs-string">"Show me articles about AI published in the last month"</span>
-        Available <span class="hljs-attribute">Tools</span>:
-          - search_news (searches recent news)
-          - search_academic (searches research papers)
-          - search_general (general web search)
-        
-        <span class="hljs-attribute">Selection</span>: search_news is most appropriate
-        <span class="hljs-attribute">Payload</span>: { <span class="hljs-attribute">topic</span>: <span class="hljs-string">"AI"</span>, <span class="hljs-attribute">time_range</span>: <span class="hljs-string">"last_30_days"</span> }
-        </code></pre>
-            <h3 id="pattern-3-sequential-tool-calls">Pattern 3: Sequential Tool Calls</h3>
-            <pre><code><span class="hljs-attribute">User</span>: <span class="hljs-string">"Send an email to my boss about the project, and add it to calendar"</span>
-        Step <span class="hljs-number">1</span>: Retrieve contact info
-          - get_contact(<span class="hljs-string">"boss"</span>) → email<span class="hljs-variable">@company</span>.com
-        Step <span class="hljs-number">2</span>: Send email
-          - send_email(<span class="hljs-attribute">to</span>: <span class="hljs-string">"email@company.com"</span>, <span class="hljs-attribute">subject</span>: ..., <span class="hljs-attribute">body</span>: ...)
-        Step <span class="hljs-number">3</span>: Create calendar event
-          - create_event(<span class="hljs-attribute">title</span>: <span class="hljs-string">"Project update"</span>, <span class="hljs-attribute">attendee</span>: <span class="hljs-string">"email@company.com"</span>)
-        </code></pre>
-            <h3 id="pattern-4-conditional-tool-selection">Pattern 4: Conditional Tool Selection</h3>
-            <pre><code>User: "What's our Q2 revenue?"
-        Decision Tree:
-          - Is user authenticated? (<span class="hljs-keyword">check</span> permissions)
-          - <span class="hljs-keyword">Is</span> request <span class="hljs-keyword">for</span> <span class="hljs-built_in">real</span>-<span class="hljs-keyword">time</span> <span class="hljs-keyword">or</span> historical <span class="hljs-keyword">data</span>? (<span class="hljs-keyword">choose</span> tool)
-          - Does <span class="hljs-keyword">user</span> have <span class="hljs-keyword">access</span> <span class="hljs-keyword">level</span>? (<span class="hljs-keyword">check</span> <span class="hljs-keyword">security</span>)
-          - <span class="hljs-keyword">Call</span> appropriate financial API <span class="hljs-keyword">with</span> validated <span class="hljs-keyword">access</span>
-        </code></pre>
-            <h3 id="pattern-5-fallback-and-error-handling">Pattern 5: Fallback and Error Handling</h3>
-            <pre><code>User: <span class="hljs-string">"Book a flight to Tokyo for March 15"</span>
-        Primary Tool: flight_booking_api
-          - <span class="hljs-keyword">Try</span> <span class="hljs-keyword">to</span> book <span class="hljs-keyword">with</span> available seats
-          - <span class="hljs-keyword">If</span> sold out → Fallback <span class="hljs-keyword">to</span> alternative_flights
-          - <span class="hljs-keyword">If</span> no flights → Suggest dates <span class="hljs-keyword">or</span> alternatives
-          - <span class="hljs-keyword">If</span> payment fails → <span class="hljs-keyword">Return</span> <span class="hljs-keyword">error</span> <span class="hljs-keyword">with</span> retry instructions
-        </code></pre>
-            <hr>
-            <h2 id="part-5-type-system-and-parameter-validation">Part 5: Type System and Parameter Validation</h2>
-            <h3 id="fundamental-data-types">Fundamental Data Types</h3>
-            <div class="table">
-                <table>
-                    <thead>
-                        <tr class="tr">
-                            <th>Type</th>
-                            <th>Example</th>
-                            <th>Use Case</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr class="tr">
-                            <td>string</td>
-                            <td>&quot;hello&quot;, &quot;john@example.com&quot;</td>
-                            <td>Text, emails, names</td>
-                        </tr>
-                        <tr class="tr">
-                            <td>number</td>
-                            <td>42, 3.14</td>
-                            <td>Quantities, prices, IDs</td>
-                        </tr>
-                        <tr class="tr">
-                            <td>integer</td>
-                            <td>5, -10</td>
-                            <td>Counts, years, page numbers</td>
-                        </tr>
-                        <tr class="tr">
-                            <td>boolean</td>
-                            <td>true, false</td>
-                            <td>Flags, yes/no questions</td>
-                        </tr>
-                        <tr class="tr">
-                            <td>array</td>
-                            <td>[1,2,3], [&quot;a&quot;,&quot;b&quot;]</td>
-                            <td>Lists, multiple values</td>
-                        </tr>
-                        <tr class="tr">
-                            <td>object</td>
-                            <td>{name: &quot;John&quot;, age: 30}</td>
-                            <td>Complex structures</td>
-                        </tr>
-                        <tr class="tr">
-                            <td>null</td>
-                            <td>null</td>
-                            <td>No value, not provided</td>
-                        </tr>
-                    </tbody>
-                </table>
+
+            <div class="example">
+                <div class="example-title">📝 Example Scenario</div>
+                <p><strong>User:</strong> "What's the weather in Paris?"</p>
+                <p style="margin: 0.5rem 0;"><strong>Without function calling:</strong> "It's probably nice in spring..."</p>
+                <p style="margin: 0;"><strong>With function calling:</strong> Calls weather_tool → Returns "Current: 18°C, Sunny"</p>
             </div>
-            <h3 id="parameter-validation-rules">Parameter Validation Rules</h3>
-            <p><strong>Required vs Optional</strong>:</p>
-            <pre><code>Required Parameters: MUST be included
-          - No <span class="hljs-keyword">default</span> <span class="hljs-keyword">value</span>
-          - Error <span class="hljs-keyword">if</span> missing
-        
-        <span class="hljs-keyword">Optional</span> Parameters: CAN be omitted
-          - Has <span class="hljs-keyword">default</span> <span class="hljs-keyword">value</span>
-          - Error <span class="hljs-keyword">only</span> <span class="hljs-keyword">if</span> invalid <span class="hljs-keyword">format</span>
-        </code></pre>
-            <p><strong>Type Validation</strong>:</p>
-            <pre><code><span class="hljs-attribute">Parameter</span>: age (<span class="hljs-attribute">type</span>: integer)
-        ✓ <span class="hljs-attribute">Valid</span>: <span class="hljs-number">25</span>, <span class="hljs-number">0</span>, <span class="hljs-number">100</span>
-        ✗ <span class="hljs-attribute">Invalid</span>: <span class="hljs-string">"25"</span>, <span class="hljs-number">25.5</span>, <span class="hljs-string">"twenty"</span>
-        
-        <span class="hljs-attribute">Parameter</span>: tags (<span class="hljs-attribute">type</span>: array of strings)
-        ✓ <span class="hljs-attribute">Valid</span>: [<span class="hljs-string">"urgent"</span>, <span class="hljs-string">"follow-up"</span>], []
-        ✗ <span class="hljs-attribute">Invalid</span>: <span class="hljs-string">"urgent"</span>, <span class="hljs-string">"urgent,follow-up"</span>, [<span class="hljs-number">1</span>, <span class="hljs-number">2</span>]
-        </code></pre>
-            <p><strong>Enum Constraints</strong>:</p>
-            <pre><code><span class="hljs-attribute">Parameter</span>: priority (<span class="hljs-attribute">enum</span>: [<span class="hljs-string">"low"</span>, <span class="hljs-string">"medium"</span>, <span class="hljs-string">"high"</span>])
-        ✓ <span class="hljs-attribute">Valid</span>: <span class="hljs-string">"high"</span>, <span class="hljs-string">"low"</span>
-        ✗ <span class="hljs-attribute">Invalid</span>: <span class="hljs-string">"urgent"</span>, <span class="hljs-string">"critical"</span>, <span class="hljs-string">"MEDIUM"</span>
-        </code></pre>
-            <p><strong>Range and Format Validation</strong>:</p>
-            <pre><code><span class="hljs-attribute">Parameter</span>: min_price (<span class="hljs-attribute">type</span>: number, <span class="hljs-attribute">minimum</span>: <span class="hljs-number">0</span>, <span class="hljs-attribute">maximum</span>: <span class="hljs-number">10000</span>)
-        ✓ <span class="hljs-attribute">Valid</span>: <span class="hljs-number">0</span>, <span class="hljs-number">500</span>, <span class="hljs-number">10000</span>
-        ✗ <span class="hljs-attribute">Invalid</span>: -<span class="hljs-number">50</span>, <span class="hljs-number">15000</span>
-        
-        <span class="hljs-attribute">Parameter</span>: email (<span class="hljs-attribute">type</span>: string, <span class="hljs-attribute">format</span>: email)
-        ✓ <span class="hljs-attribute">Valid</span>: <span class="hljs-string">"user@example.com"</span>
-        ✗ <span class="hljs-attribute">Invalid</span>: <span class="hljs-string">"not-an-email"</span>, <span class="hljs-string">"user@"</span>
-        </code></pre>
-            <hr>
-            <h2 id="part-6-evaluation-criteria-for-function-calling-tests">Part 6: Evaluation Criteria for Function
-                Calling Tests
-            </h2>
-            <h3 id="criterion-1-tool-identification">Criterion 1: Tool Identification</h3>
-            <p><strong>What&#39;s Being Tested</strong>: Can you recognize which tool is needed?</p>
-            <p><strong>Example Test</strong>:</p>
-            <pre><code>TOOLS AVAILABLE:
-        1. get_user_profile(user_id)
-        2. update_user_settings(user_id, settings)
-        3. delete_user_account(user_id)
-        4. send_password_reset(email)
-        
-        SCENARIO: <span class="hljs-string">"John forgot his password"</span>
-        
-        CORRECT ANSWER: send_password_reset
-        REASONING: Forgot password = needs password reset, not account modification
-        
-        COMMON MISTAKES:
-        - Choosing get_user_profile (doesn't help with password)
-        - Choosing update_user_settings (wrong type of update)
-        </code></pre>
-            <h3 id="criterion-2-parameter-extraction">Criterion 2: Parameter Extraction</h3>
-            <p><strong>What&#39;s Being Tested</strong>: Can you extract the right information and map it to
-                parameters?</p>
-            <p><strong>Example Test</strong>:</p>
-            <pre><code><span class="hljs-attribute">FUNCTION</span>: book_flight
-        <span class="hljs-attribute">PARAMETERS</span>: origin, destination, departure_date, passengers, class
-        
-        <span class="haml">USER REQUEST: "I need to fly to Paris from New York on March 15 with my wife in economy"
-        
-        CORRECT MAPPING:
-        -<span class="ruby"> <span class="hljs-symbol">origin:</span> <span class="hljs-string">"New York"</span> (<span class="hljs-keyword">or</span> airport code <span class="hljs-string">"JFK"</span>)
-        </span>-<span class="ruby"> <span class="hljs-symbol">destination:</span> <span class="hljs-string">"Paris"</span> (<span class="hljs-keyword">or</span> airport code <span class="hljs-string">"CDG"</span>)
-        </span>-<span class="ruby"> <span class="hljs-symbol">departure_date:</span> <span class="hljs-string">"2025-03-15"</span> (format YYYY-MM-DD)
-        </span>-<span class="ruby"> <span class="hljs-symbol">passengers:</span> <span class="hljs-number">2</span> (user + wife)
-        </span>-<span class="ruby"> <span class="hljs-class"><span class="hljs-keyword">class</span>: "<span class="hljs-title">economy</span>"</span>
-        </span>
-        COMMON MISTAKES:
-        -<span class="ruby"> Missing required parameters
-        </span>-<span class="ruby"> Wrong format (date as <span class="hljs-string">"March 15"</span> instead of ISO format)
-        </span>-<span class="ruby"> Over-specifying (including preference <span class="hljs-keyword">for</span> airline <span class="hljs-keyword">when</span> <span class="hljs-keyword">not</span> asked)
-        </span>-<span class="ruby"> Hallucinating parameters <span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> user request</span></span>
-        </code></pre>
-            <h3 id="criterion-3-payload-construction">Criterion 3: Payload Construction</h3>
-            <p><strong>What&#39;s Being Tested</strong>: Can you format parameters correctly for the API?</p>
-            <p><strong>Example Test</strong>:</p>
-            <pre><code>FUNCTION: search_products
-        FORMAT: {<span class="hljs-string">"search_term"</span>: <span class="hljs-keyword">string</span>, <span class="hljs-string">"filters"</span>: object, <span class="hljs-string">"sort"</span>: <span class="hljs-keyword">string</span>, <span class="hljs-string">"limit"</span>: integer}
-        
-        <span class="hljs-keyword">USER</span> <span class="hljs-title">REQUEST</span>: <span class="hljs-string">"Show me red shoes under $50, sorted by price"</span>
-        
-        CORRECT PAYLOAD:
-        {
-          <span class="hljs-string">"search_term"</span>: <span class="hljs-string">"shoes"</span>,
-          <span class="hljs-string">"filters"</span>: {
-            <span class="hljs-string">"color"</span>: <span class="hljs-string">"red"</span>,
-            <span class="hljs-string">"max_price"</span>: <span class="hljs-number">50</span>
-          },
-          <span class="hljs-string">"sort"</span>: <span class="hljs-string">"price_asc"</span>,
-          <span class="hljs-string">"limit"</span>: <span class="hljs-number">10</span>
-        }
-        
-        COMMON MISTAKES:
-        {
-          <span class="hljs-string">"search_term"</span>: <span class="hljs-string">"red shoes under $50"</span>,  // WRONG: metadata <span class="hljs-keyword">in</span> search term
-          <span class="hljs-string">"filters"</span>: {
-            <span class="hljs-string">"color"</span>: <span class="hljs-string">"red"</span>,
-            <span class="hljs-string">"price"</span>: <span class="hljs-string">"under 50"</span>  // WRONG: <span class="hljs-keyword">string</span> instead of <span class="hljs-keyword">number</span>
-          },
-          <span class="hljs-string">"sort"</span>: <span class="hljs-string">"cheapest"</span>  // WRONG: not <span class="hljs-keyword">in</span> valid options
-        }
-        </code></pre>
-            <h3 id="criterion-4-handling-missing-information">Criterion 4: Handling Missing Information</h3>
-            <p><strong>What&#39;s Being Tested</strong>: Can you make reasonable inferences or ask for
-                clarification?</p>
-            <p><strong>Example Test</strong>:</p>
-            <pre><code>FUNCTION: schedule_meeting(<span class="hljs-built_in">title</span>, <span class="hljs-built_in">date</span>, <span class="hljs-built_in">time</span>, attendees, duration)
-        USER REQUEST: <span class="hljs-string">"Schedule a meeting with the engineering team"</span>
-        
-        MISSING INFORMATION:
-        - <span class="hljs-built_in">date</span>: <span class="hljs-keyword">Not</span> specified
-        - <span class="hljs-built_in">time</span>: <span class="hljs-keyword">Not</span> specified
-        - duration: <span class="hljs-keyword">Not</span> specified
-        - <span class="hljs-built_in">title</span>: Generic request, could infer <span class="hljs-string">"Engineering Team Meeting"</span>
-        
-        CORRECT APPROACH:
-        Option A - <span class="hljs-built_in">Make</span> Reasonable Inferences:
-        {
-          <span class="hljs-string">"title"</span>: <span class="hljs-string">"Engineering Team Meeting"</span>,
-          <span class="hljs-string">"date"</span>: <span class="hljs-string">"next_business_day"</span>,
-          <span class="hljs-string">"time"</span>: <span class="hljs-string">"10:00"</span>,
-          <span class="hljs-string">"attendees"</span>: [<span class="hljs-string">"engineering@company.com"</span>],
-          <span class="hljs-string">"duration"</span>: <span class="hljs-number">60</span>
-        }
-        
-        Option B - Ask <span class="hljs-keyword">for</span> Clarification:
-        <span class="hljs-string">"I can schedule that meeting, but I need a few details:
-        - What date works best?
-        - What time would you prefer?
-        - How long should the meeting be?"</span>
-        </code></pre>
-            <h3 id="criterion-5-error-handling">Criterion 5: Error Handling</h3>
-            <p><strong>What&#39;s Being Tested</strong>: Can you handle invalid scenarios gracefully?</p>
-            <p><strong>Example Test</strong>:</p>
-            <pre><code><span class="hljs-attribute">FUNCTION</span>: withdraw_money(account_id, amount)
-        <span class="hljs-attribute">SCENARIO</span>: User requests to withdraw $5000 from account with $2000 balance
-        
-        <span class="nginx"><span class="hljs-attribute">CORRECT</span> HANDLING:
-        Option A - Detect and Prevent:
-        <span class="hljs-string">"Cannot proceed: Insufficient funds. Your balance is <span class="hljs-variable">$2000</span>, 
-        but you're trying to withdraw <span class="hljs-variable">$5000</span>. 
-        Maximum withdrawal: <span class="hljs-variable">$2000</span>"</span>
-        
-        Option B - Identify the Issue:
-        <span class="hljs-string">"I notice you're trying to withdraw more than available. 
-        Would you like to withdraw the full <span class="hljs-variable">$2000</span> instead?"</span>
-        
-        INCORRECT HANDLING:
-        - Silently proceeding with invalid amount
-        - Returning cryptic <span class="hljs-literal">error</span> code
-        - Making an unauthorized negative balance</span>
-        </code></pre>
-            <h3 id="criterion-6-multi-step-reasoning">Criterion 6: Multi-Step Reasoning</h3>
-            <p><strong>What&#39;s Being Tested</strong>: Can you chain multiple function calls?</p>
-            <p><strong>Example Test</strong>:</p>
-            <pre><code>USER REQUEST: <span class="hljs-string">"Send an email reminder to all attendees of tomorrow's 
-        standup meeting with the meeting link"</span>
-        
-        REQUIRED STEPS:
-        <span class="hljs-number">1</span>. get_calendar_event(<span class="hljs-built_in">name</span>: <span class="hljs-string">"standup"</span>, <span class="hljs-built_in">date</span>: <span class="hljs-string">"tomorrow"</span>)
-           Returns: event details including attendees <span class="hljs-built_in">and</span> link
-        <span class="hljs-number">2</span>. send_email_bulk(recipients: attendees, template: <span class="hljs-string">"meeting_reminder"</span>)
-           Sends email <span class="hljs-keyword">with</span> link extracted <span class="hljs-keyword">from</span> event
-        
-        CORRECT SEQUENCE:
-        <span class="hljs-number">1</span>. <span class="hljs-built_in">Call</span> get_calendar_event first (need <span class="hljs-keyword">to</span> retrieve attendees + link)
-        <span class="hljs-number">2</span>. <span class="hljs-built_in">Call</span> send_email_bulk <span class="hljs-keyword">with</span> data <span class="hljs-keyword">from</span> <span class="hljs-built_in">step</span> <span class="hljs-number">1</span>
-        
-        COMMON MISTAKES:
-        - Reversing the order (<span class="hljs-keyword">try</span> <span class="hljs-keyword">to</span> send before getting attendees)
-        - <span class="hljs-built_in">Not</span> extracting the meeting link <span class="hljs-keyword">from</span> event details
-        - Calling functions <span class="hljs-built_in">in</span> parallel when they need <span class="hljs-keyword">to</span> be sequential
-        </code></pre>
-            <hr>
-            <h2 id="part-7-real-world-test-scenarios">Part 7: Real-World Test Scenarios</h2>
-            <h3 id="scenario-1-e-commerce-product-search">Scenario 1: E-Commerce Product Search</h3>
-            <pre><code>SYSTEM FUNCTIONS:
-        - search_products(query, category, filters, <span class="hljs-keyword">sort</span>, pagination)
-        - get_product_details(product_id)
-        - check_inventory(product_id, location)
-        - add_to_cart(user_id, product_id, quantity)
-        
-        USER REQUEST: <span class="hljs-comment">"Find me winter jackets for women under $200, </span>
-        show the cheapest ones <span class="hljs-keyword">first</span><span class="hljs-comment">"</span>
-        
-        ANALYSIS:
-        ✓ Primary Too<span class="hljs-variable">l:</span> search_products
-          - query: <span class="hljs-string">"winter jackets"</span>
-          - category: <span class="hljs-string">"women's clothing"</span> (infer from <span class="hljs-string">"for women"</span>)
-          - <span class="hljs-built_in">filter</span><span class="hljs-variable">s:</span> {<span class="hljs-string">"max_price"</span>: <span class="hljs-number">200</span>, <span class="hljs-string">"gender"</span>: <span class="hljs-string">"women"</span>}
-          - <span class="hljs-keyword">sor</span><span class="hljs-variable">t:</span> <span class="hljs-string">"price_ascending"</span>
-        
-        ✓ Secondary: get_product_details (<span class="hljs-keyword">for</span> top results <span class="hljs-keyword">if</span> needed)
-        
-        ✓ Tertiary: check_inventory (<span class="hljs-keyword">if</span> user wants <span class="hljs-keyword">to</span> purchase)
-        
-        PAYLOAD:
-        {
-          <span class="hljs-string">"query"</span>: <span class="hljs-string">"winter jackets"</span>,
-          <span class="hljs-string">"category"</span>: <span class="hljs-string">"women's clothing"</span>,
-          <span class="hljs-string">"filters"</span>: {
-            <span class="hljs-string">"gender"</span>: <span class="hljs-string">"women"</span>,
-            <span class="hljs-string">"max_price"</span>: <span class="hljs-number">200</span>,
-            <span class="hljs-string">"season"</span>: <span class="hljs-string">"winter"</span>
-          },
-          <span class="hljs-string">"sort"</span>: <span class="hljs-string">"price_ascending"</span>,
-          <span class="hljs-string">"pagination"</span>: {
-            <span class="hljs-string">"limit"</span>: <span class="hljs-number">20</span>,
-            <span class="hljs-string">"offset"</span>: <span class="hljs-number">0</span>
-          }
-        }
-        
-        EVALUATION POINTS:
-        <span class="hljs-number">1</span>. ✓ Identified correct tool (search_products, not get_product_details)
-        <span class="hljs-number">2</span>. ✓ Extracted parameters accurately (gender, price <span class="hljs-built_in">range</span>)
-        <span class="hljs-number">3</span>. ✓ Formatted payload correctly (filters <span class="hljs-keyword">as</span> object, <span class="hljs-keyword">sort</span> <span class="hljs-keyword">as</span> <span class="hljs-built_in">string</span>)
-        <span class="hljs-number">4</span>. ✓ Inferred category from user description
-        <span class="hljs-number">5</span>. ✓ Chose reasonable defaults (pagination limit)
-        </code></pre>
-            <h3 id="scenario-2-calendar-management">Scenario 2: Calendar Management</h3>
-            <pre><code>SYSTEM FUNCTIONS:
-        - get_calendar_availability(user_id, start_date, end_date)
-        - create_event(title, start_time, end_time, attendees, <span class="hljs-built_in">location</span>)
-        - find_common_availability(attendee_ids, duration, preferences)
-        - send_invitations(event_id, attendees)
-        
-        USER REQUEST: <span class="hljs-string">"Schedule a 1-hour meeting with Sarah and Mike 
-        next week, whenever everyone is available"</span>
-        
-        ANALYSIS:
-        <span class="hljs-built_in">Step</span> <span class="hljs-number">1</span>: <span class="hljs-built_in">Find</span> availability
-        ✓ Tool: find_common_availability
-          - attendee_ids: [<span class="hljs-string">"sarah_id"</span>, <span class="hljs-string">"mike_id"</span>, <span class="hljs-string">"user_id"</span>]
-          - duration: <span class="hljs-number">60</span> (minutes)
-          - date_range: <span class="hljs-string">"next week"</span>
-        
-        <span class="hljs-built_in">Step</span> <span class="hljs-number">2</span>: Create event (after receiving availability)
-        ✓ Tool: create_event
-          - title: <span class="hljs-string">"Meeting with Sarah and Mike"</span>
-          - start_time: (<span class="hljs-keyword">from</span> availability results)
-          - end_time: (start + <span class="hljs-number">60</span> minutes)
-          - attendees: [<span class="hljs-string">"sarah@company.com"</span>, <span class="hljs-string">"mike@company.com"</span>]
-          - <span class="hljs-built_in">location</span>: <span class="hljs-string">"virtual"</span> (infer, <span class="hljs-built_in">not</span> specified)
-        
-        <span class="hljs-built_in">Step</span> <span class="hljs-number">3</span>: Send invitations
-        ✓ Tool: send_invitations
-        
-        PAYLOAD (<span class="hljs-built_in">Step</span> <span class="hljs-number">1</span>):
-        {
-          <span class="hljs-string">"attendee_ids"</span>: [<span class="hljs-string">"user_123"</span>, <span class="hljs-string">"sarah_456"</span>, <span class="hljs-string">"mike_789"</span>],
-          <span class="hljs-string">"duration"</span>: <span class="hljs-number">60</span>,
-          <span class="hljs-string">"preferences"</span>: {
-            <span class="hljs-string">"earliest_time"</span>: <span class="hljs-string">"09:00"</span>,
-            <span class="hljs-string">"latest_time"</span>: <span class="hljs-string">"17:00"</span>,
-            <span class="hljs-string">"exclude_weekends"</span>: <span class="hljs-literal">true</span>
-          }
-        }
-        
-        PAYLOAD (<span class="hljs-built_in">Step</span> <span class="hljs-number">2</span> - conditional on <span class="hljs-built_in">Step</span> <span class="hljs-number">1</span> result):
-        {
-          <span class="hljs-string">"title"</span>: <span class="hljs-string">"Meeting with Sarah and Mike"</span>,
-          <span class="hljs-string">"start_time"</span>: <span class="hljs-string">"2025-04-14T14:00:00Z"</span>,
-          <span class="hljs-string">"end_time"</span>: <span class="hljs-string">"2025-04-14T15:00:00Z"</span>,
-          <span class="hljs-string">"attendees"</span>: [<span class="hljs-string">"sarah@company.com"</span>, <span class="hljs-string">"mike@company.com"</span>],
-          <span class="hljs-string">"location"</span>: <span class="hljs-string">"virtual"</span>
-        }
-        
-        EVALUATION POINTS:
-        <span class="hljs-number">1</span>. ✓ Sequential reasoning (<span class="hljs-built_in">find</span> availability before creating)
-        <span class="hljs-number">2</span>. ✓ Correct tool selection (find_common_availability, <span class="hljs-built_in">not</span> individual lookups)
-        <span class="hljs-number">3</span>. ✓ Parameter extraction (duration: <span class="hljs-number">60</span>, <span class="hljs-built_in">not</span> <span class="hljs-string">"1 hour"</span> string)
-        <span class="hljs-number">4</span>. ✓ Handling dependencies (can<span class="hljs-string">'t create event without availability data)
-        5. ✓ Reasonable defaults (virtual location, business hours)</span>
-        </code></pre>
-            <h3 id="scenario-3-error-handling-with-fallback">Scenario 3: Error Handling with Fallback</h3>
-            <pre><code>SYSTEM FUNCTIONS:
-        - transfer_money(from_account, to_account, amount, instant=false)
-        - check_balance(account_id)
-        - request_line_of_credit(account_id, amount)
-        - send_notification(user_id, message)
-        
-        USER REQUEST: "Transfer $500 to my friend's account"
-        
-        INITIAL ANALYSIS:
-        1. Missing: Which account? Friend's account details?
-        2. Risk: Could fail if insufficient funds
-        
-        CORRECT APPROACH (with error handling):
-        Step 1: Validate
-        - <span class="hljs-keyword">Check</span> balance: check_balance(user_account)
-        - <span class="hljs-keyword">Verify</span> amount available
-        
-        Step <span class="hljs-number">2</span>a (<span class="hljs-keyword">if</span> sufficient funds):
-        {
-          <span class="hljs-string">"from_account"</span>: <span class="hljs-string">"user_account_123"</span>,
-          <span class="hljs-string">"to_account"</span>: <span class="hljs-string">"friend_account_456"</span>,
-          <span class="hljs-string">"amount"</span>: <span class="hljs-number">500</span>,
-          <span class="hljs-string">"instant"</span>: <span class="hljs-literal">true</span>
-        }
-        
-        Step <span class="hljs-number">2</span>b (<span class="hljs-keyword">if</span> insufficient funds):
-        <span class="hljs-keyword">Option</span> <span class="hljs-number">1</span>: Offer alternatives
-        <span class="hljs-string">"Your balance is $300. You can transfer $300 now, 
-        or I can help you request a line of credit. Which would you prefer?"</span>
-        
-        <span class="hljs-keyword">Option</span> <span class="hljs-number">2</span>: Request credit
-        {
-          <span class="hljs-string">"account_id"</span>: <span class="hljs-string">"user_account_123"</span>,
-          <span class="hljs-string">"amount"</span>: <span class="hljs-number">500</span>
-        }
-        
-        <span class="hljs-keyword">Then</span> transfer <span class="hljs-keyword">after</span> approval.
-        
-        EVALUATION POINTS:
-        <span class="hljs-number">1.</span> ✓ <span class="hljs-keyword">Identified</span> <span class="hljs-keyword">missing</span> information
-        <span class="hljs-number">2.</span> ✓ Added <span class="hljs-keyword">validation</span> step (check_balance)
-        <span class="hljs-number">3.</span> ✓ Planned <span class="hljs-keyword">for</span> multiple outcomes
-        <span class="hljs-number">4.</span> ✓ Offered alternatives <span class="hljs-keyword">on</span> <span class="hljs-keyword">failure</span>
-        <span class="hljs-number">5.</span> ✓ <span class="hljs-keyword">Clear</span> communication <span class="hljs-keyword">of</span> limitations
-        </code></pre>
-            <hr>
-            <h2 id="part-8-common-mistakes-and-how-to-avoid-them">Part 8: Common Mistakes and How to Avoid Them</h2>
-            <h3 id="mistake-1-hallucinating-parameters">Mistake 1: Hallucinating Parameters</h3>
-            <pre><code>WRONG:
-        User: <span class="hljs-string">"Show me laptops"</span>
-        Function: search_products(query, filters)
-        Constructed: {
-          <span class="hljs-string">"query"</span>: <span class="hljs-string">"laptops"</span>,
-          <span class="hljs-string">"filters"</span>: {
-            <span class="hljs-string">"brand"</span>: <span class="hljs-string">"Dell"</span>,  ← <span class="hljs-keyword">User</span> <span class="hljs-title">never</span> mentioned Dell!
-            <span class="hljs-string">"warranty"</span>: <span class="hljs-string">"3-year"</span>,  ← <span class="hljs-keyword">User</span> <span class="hljs-title">never</span> mentioned warranty!
-            <span class="hljs-string">"color"</span>: <span class="hljs-string">"silver"</span>  ← <span class="hljs-keyword">User</span> <span class="hljs-title">never</span> specified color!
-          }
-        }
-        
-        CORRECT:
-        {
-          <span class="hljs-string">"query"</span>: <span class="hljs-string">"laptops"</span>,
-          <span class="hljs-string">"filters"</span>: {}  ← Empty if no filters specified
-        }
-        
-        Then ask: <span class="hljs-string">"What specs matter most? Brand, price range, screen size?"</span>
-        </code></pre>
-            <h3 id="mistake-2-using-wrong-data-types">Mistake 2: Using Wrong Data Types</h3>
-            <pre><code>WRONG:
-        Function: book_hotel(check_in, check_out, guests)
-        -<span class="ruby"> <span class="hljs-symbol">check_in:</span> <span class="hljs-string">"next Friday"</span> (string, <span class="hljs-keyword">not</span> date)
-        </span>-<span class="ruby"> <span class="hljs-symbol">check_out:</span> <span class="hljs-string">"3 nights later"</span> (duration, <span class="hljs-keyword">not</span> date)
-        </span>-<span class="ruby"> <span class="hljs-symbol">guests:</span> <span class="hljs-string">"a couple with two kids"</span> (description, <span class="hljs-keyword">not</span> number)
-        </span>
-        CORRECT:
-        -<span class="ruby"> <span class="hljs-symbol">check_in:</span> <span class="hljs-string">"2025-04-18"</span> (ISO date format)
-        </span>-<span class="ruby"> <span class="hljs-symbol">check_out:</span> <span class="hljs-string">"2025-04-21"</span> (ISO date format, calculated)
-        </span>-<span class="ruby"> <span class="hljs-symbol">guests:</span> <span class="hljs-number">4</span> (integer count)</span>
-        </code></pre>
-            <h3 id="mistake-3-ignoring-required-parameters">Mistake 3: Ignoring Required Parameters</h3>
-            <pre><code>WRONG:
-        Function: create_account(email, password, username)
-        All three REQUIRED
-        
-        User request: "<span class="hljs-keyword">Create</span> an <span class="hljs-keyword">account</span> <span class="hljs-keyword">with</span> [email]<span class="hljs-string">"
-        Payload: { "</span>email<span class="hljs-string">": "</span><span class="hljs-keyword">user</span>@example.com<span class="hljs-string">" }
-        ← Missing password and username!
-        
-        CORRECT:
-        Ask user: "</span>I can <span class="hljs-keyword">create</span> that account. I need:
-        - Email: ✓ provided
-        - Username: ? (what should it be?)
-        - <span class="hljs-keyword">Password</span>: ? (<span class="hljs-keyword">set</span> one <span class="hljs-keyword">now</span> <span class="hljs-keyword">or</span> <span class="hljs-keyword">auto</span>-generate?)<span class="hljs-string">"</span>
-        </code></pre>
-            <h3 id="mistake-4-calling-tools-in-wrong-order">Mistake 4: Calling Tools in Wrong Order</h3>
-            <pre><code>WRONG:
-        User: <span class="hljs-string">"What are my upcoming meetings and how much time do I have today?"</span>
-        
-        <span class="hljs-keyword">Step</span> <span class="hljs-number">1</span>: calculate_free_time(<span class="hljs-built_in">date</span>: <span class="hljs-string">"today"</span>)  ← Calls before getting meetings
-        <span class="hljs-keyword">Step</span> <span class="hljs-number">2</span>: get_calendar_events(<span class="hljs-built_in">date</span>: <span class="hljs-string">"today"</span>)  ← But this <span class="hljs-keyword">is</span> needed <span class="hljs-keyword">for</span> calculation!
-        
-        CORRECT:
-        <span class="hljs-keyword">Step</span> <span class="hljs-number">1</span>: get_calendar_events(<span class="hljs-built_in">date</span>: <span class="hljs-string">"today"</span>)  ← <span class="hljs-keyword">Get</span> events first
-        <span class="hljs-keyword">Step</span> <span class="hljs-number">2</span>: calculate_free_time(events: [...])  ← <span class="hljs-keyword">Then</span> calculate <span class="hljs-keyword">from</span> events
-        </code></pre>
-            <h3 id="mistake-5-over-specifying-optional-parameters">Mistake 5: Over-Specifying Optional Parameters
-            </h3>
-            <pre><code>WRONG:
-        User: <span class="hljs-string">"Send me a receipt for that purchase"</span>
-        Function: send_email(recipient, subject, body, cc, bcc, priority, template, retries, timeout, encryption, ...)
-        
-        Payload: {
-          <span class="hljs-string">"recipient"</span>: <span class="hljs-string">"user@example.com"</span>,
-          <span class="hljs-string">"subject"</span>: <span class="hljs-string">"Your Receipt"</span>,
-          <span class="hljs-string">"body"</span>: <span class="hljs-string">"..."</span>,
-          <span class="hljs-string">"cc"</span>: [],
-          <span class="hljs-string">"bcc"</span>: [],
-          <span class="hljs-string">"priority"</span>: <span class="hljs-string">"normal"</span>,
-          <span class="hljs-string">"template"</span>: <span class="hljs-string">"receipt"</span>,
-          <span class="hljs-string">"retries"</span>: <span class="hljs-number">3</span>,
-          <span class="hljs-string">"timeout"</span>: <span class="hljs-number">30</span>,
-          <span class="hljs-string">"encryption"</span>: <span class="hljs-string">"TLS"</span>
-        }
-        
-        CORRECT (only required/relevant):
-        {
-          <span class="hljs-string">"recipient"</span>: <span class="hljs-string">"user@example.com"</span>,
-          <span class="hljs-string">"subject"</span>: <span class="hljs-string">"Your Receipt"</span>,
-          <span class="hljs-string">"body"</span>: <span class="hljs-string">"..."</span>,
-          <span class="hljs-string">"template"</span>: <span class="hljs-string">"receipt"</span>
-        }
-        ← Let <span class="hljs-keyword">system</span> <span class="hljs-keyword">use</span> defaults <span class="hljs-keyword">for</span> the rest
-        </code></pre>
-            <hr>
-            <h2 id="part-9-advanced-topics">Part 9: Advanced Topics</h2>
-            <h3 id="advanced-topic-1-context-aware-tool-selection">Advanced Topic 1: Context-Aware Tool Selection
-            </h3>
-            <pre><code><span class="hljs-attribute">SCENARIO</span>: "Get me info about Python"
-        
-        <span class="haml">Available tools:
-        -<span class="ruby"> search_programming_docs(language, topic)
-        </span>-<span class="ruby"> search_snakes(species)
-        </span>-<span class="ruby"> search_movies(title)
-        </span>
-        CONTEXT MATTERS:
-        -<span class="ruby"> If context = <span class="hljs-string">"I'm learning to code"</span> → programming docs
-        </span>-<span class="ruby"> If context = <span class="hljs-string">"I'm at the zoo"</span> → snakes
-        </span>-<span class="ruby"> If context = <span class="hljs-string">"movie night ideas"</span> → movies
-        </span>
-        CORRECT APPROACH:
-        Use conversational history and context to disambiguate:
-        "I can help! Are you looking for:
-        1. Python programming documentation
-        2. Information about Python snakes
-        3. Python movies or shows"</span>
-        </code></pre>
-            <h3 id="advanced-topic-2-handling-api-limitations">Advanced Topic 2: Handling API Limitations</h3>
-            <pre><code><span class="hljs-attribute">SCENARIO</span>: User wants to retrieve 10,000 customer records
-        
-        <span class="groovy">Available <span class="hljs-string">function:</span> get_customers(limit, offset)
-        <span class="hljs-string">Limitation:</span> max_limit = <span class="hljs-number">1000</span>
-        
-        WRONG <span class="hljs-string">APPROACH:</span>
-        { <span class="hljs-string">"limit"</span>: <span class="hljs-number">10000</span> }  ← Will fail or <span class="hljs-keyword">return</span> partial data
-        
-        CORRECT <span class="hljs-string">APPROACH:</span>
-        Recognize limitation and implement <span class="hljs-string">pagination:</span>
-        Call <span class="hljs-number">1</span>: { <span class="hljs-string">"limit"</span>: <span class="hljs-number">1000</span>, <span class="hljs-string">"offset"</span>: <span class="hljs-number">0</span> }
-        Call <span class="hljs-number">2</span>: { <span class="hljs-string">"limit"</span>: <span class="hljs-number">1000</span>, <span class="hljs-string">"offset"</span>: <span class="hljs-number">1000</span> }
-        Call <span class="hljs-number">3</span>: { <span class="hljs-string">"limit"</span>: <span class="hljs-number">1000</span>, <span class="hljs-string">"offset"</span>: <span class="hljs-number">2000</span> }
-        ... (<span class="hljs-string">total:</span> <span class="hljs-number">10</span> calls)
-        
-        Then inform <span class="hljs-string">user:</span>
-        <span class="hljs-string">"Retrieving 10,000 customers in batches of 1,000. This will take a moment..."</span></span>
-        </code></pre>
-            <h3 id="advanced-topic-3-fallback-chains">Advanced Topic 3: Fallback Chains</h3>
-            <pre><code>USER REQUEST: <span class="hljs-string">"Find cheap flights to Tokyo"</span>
-        
-        Primary: flight_search_api
-        ├─ Success: <span class="hljs-keyword">Return</span> results
-        └─ Failure: <span class="hljs-keyword">Try</span> fallback
-        
-        Fallback <span class="hljs-number">1</span>: alternative_flight_api
-        ├─ Success: <span class="hljs-keyword">Return</span> results
-        └─ Failure: <span class="hljs-keyword">Try</span> fallback
-        
-        Fallback <span class="hljs-number">2</span>: travel_aggregator_api
-        ├─ Success: <span class="hljs-keyword">Return</span> results
-        └─ Failure: <span class="hljs-keyword">Try</span> fallback
-        
-        Fallback <span class="hljs-number">3</span>: Manual suggestion
-        └─ Suggest searching directly on airline websites
-        
-        IMPLEMENTATION:
-        <span class="hljs-keyword">try</span> {
-          flights = <span class="hljs-keyword">call</span>(flight_search_api)
-        } <span class="hljs-keyword">catch</span> {
-          <span class="hljs-keyword">try</span> {
-            flights = <span class="hljs-keyword">call</span>(alternative_flight_api)
-          } <span class="hljs-keyword">catch</span> {
-            <span class="hljs-keyword">try</span> {
-              flights = <span class="hljs-keyword">call</span>(travel_aggregator_api)
-            } <span class="hljs-keyword">catch</span> {
-              suggest_manual_search()
-            }
-          }
-        }
-        </code></pre>
-            <h3 id="advanced-topic-4-parallel-tool-calls">Advanced Topic 4: Parallel Tool Calls</h3>
-            <pre><code><span class="hljs-attribute">SCENARIO</span>: Gather multiple independent data points
-        
-        <span class="http"><span class="hljs-attribute">User</span>: "Give me a summary of today's market news and my portfolio performance"
-        
-        <span class="sqf"><span class="hljs-built_in">Independent</span> tools (can run <span class="hljs-built_in">in</span> parallel):
-        - get_market_news(<span class="hljs-built_in">date</span>: <span class="hljs-string">"today"</span>)
-        - get_portfolio_summary(user_id, <span class="hljs-built_in">date</span>: <span class="hljs-string">"today"</span>)
-        - get_stock_alerts(user_id)
-        
-        CORRECT APPROACH:
-        Execute <span class="hljs-built_in">in</span> parallel:
-        <span class="hljs-built_in">Call</span> <span class="hljs-number">1</span>: get_market_news(<span class="hljs-built_in">date</span>: <span class="hljs-string">"today"</span>)
-        <span class="hljs-built_in">Call</span> <span class="hljs-number">2</span>: get_portfolio_summary(user_id, <span class="hljs-built_in">date</span>: <span class="hljs-string">"today"</span>)
-        <span class="hljs-built_in">Call</span> <span class="hljs-number">3</span>: get_stock_alerts(user_id)
-        
-        <span class="hljs-keyword">Then</span> aggregate results <span class="hljs-built_in">and</span> present summary.
-        
-        ADVANTAGE: Faster than sequential calls
-        <span class="hljs-string">"News: [results], Your Portfolio: [results], Alerts: [results]"</span></span></span>
-        </code></pre>
-            <hr>
-            <h2 id="part-10-testing-yourself">Part 10: Testing Yourself</h2>
-            <h3 id="test-1-basic-tool-identification">Test 1: Basic Tool Identification</h3>
-            <pre><code>SCENARIO:
-        Available tools:
-        A) update_profile(user_id, field, value)
-        B) change_password(user_id, old_password, new_password)
-        C) reset_password(email)
-        D) verify_email(email, code)
-        
-        Request: <span class="hljs-string">"I lost my password and need to reset it"</span>
-        
-        ANSWER: C) reset_password
-        REASONING: User lost password (can't provide old one), so full reset needed, not change.
-        </code></pre>
-            <h3 id="test-2-parameter-extraction">Test 2: Parameter Extraction</h3>
-            <pre><code>SCENARIO:
-        Function: book_restaurant(restaurant_id, date, time, party_size, name, phone)
-        
-        Request: "Book the Italian place on Oak Street for 7 guests this Saturday at 8 PM under Johnson"
-        
-        PARAMETERS NEEDED:
-        -<span class="ruby"> <span class="hljs-symbol">restaurant_id:</span> ? (<span class="hljs-keyword">not</span> <span class="hljs-keyword">in</span> request, would need lookup)
-        </span>-<span class="ruby"> <span class="hljs-symbol">date:</span> <span class="hljs-string">"2025-04-12"</span> (this Saturday)
-        </span>-<span class="ruby"> <span class="hljs-symbol">time:</span> <span class="hljs-string">"20:00"</span> (<span class="hljs-number">8</span> PM <span class="hljs-keyword">in</span> <span class="hljs-number">24</span>-hour format)
-        </span>-<span class="ruby"> <span class="hljs-symbol">party_size:</span> <span class="hljs-number">7</span>
-        </span>-<span class="ruby"> <span class="hljs-symbol">name:</span> <span class="hljs-string">"Johnson"</span>
-        </span>-<span class="ruby"> <span class="hljs-symbol">phone:</span> ? (<span class="hljs-keyword">not</span> provided, ask user)
-        </span>
-        MISSING: restaurant_id, phone
-        SOLUTION: Ask user for phone number, lookup restaurant by name/location
-        </code></pre>
-            <h3 id="test-3-payload-construction">Test 3: Payload Construction</h3>
-            <pre><code>SCENARIO:
-        Function: filter_products(
-          category: <span class="hljs-built_in">string</span>,
-          price_range: {<span class="hljs-built_in">min</span>: <span class="hljs-keyword">number</span>, <span class="hljs-built_in">max</span>: <span class="hljs-keyword">number</span>},
-          <span class="hljs-keyword">tag</span><span class="hljs-variable">s:</span> array of strings,
-          availability: enum[available, discontinued, preorder],
-          sort_by: <span class="hljs-built_in">string</span>
-        )
-        
-        Reques<span class="hljs-variable">t:</span> <span class="hljs-comment">"Show me available winter coats between $100-300, with waterproof tag, </span>
-        sorted by rating<span class="hljs-comment">"</span>
-        
-        CORRECT PAYLOAD:
-        {
-          <span class="hljs-string">"category"</span>: <span class="hljs-string">"coats"</span>,
-          <span class="hljs-string">"price_range"</span>: {
-            <span class="hljs-string">"min"</span>: <span class="hljs-number">100</span>,
-            <span class="hljs-string">"max"</span>: <span class="hljs-number">300</span>
-          },
-          <span class="hljs-string">"tags"</span>: [<span class="hljs-string">"waterproof"</span>],
-          <span class="hljs-string">"availability"</span>: <span class="hljs-string">"available"</span>,
-          <span class="hljs-string">"sort_by"</span>: <span class="hljs-string">"rating"</span>
-        }
-        </code></pre>
-            <h3 id="test-4-error-scenarios">Test 4: Error Scenarios</h3>
-            <pre><code>SCENARIO:
-        User: <span class="hljs-string">"Transfer $10,000 to account 12345"</span>
-        Your account balance: $5,<span class="hljs-number">000</span>
-        
-        CORRECT HANDLING:
-        Option A: <span class="hljs-string">"You don't have sufficient funds. Your balance is $5,000. 
-        You're trying to transfer $10,000. Would you like to:"</span>
-        <span class="hljs-number">1</span>. Transfer the full available amount ($5,<span class="hljs-number">000</span>)?
-        <span class="hljs-number">2</span>. Cancel <span class="hljs-keyword">and</span> try again later?<span class="hljs-string">"
-        
-        Option B: "</span>This transfer would exceed your balance by $5,<span class="hljs-number">000</span>. 
-        Your account is showing a $5,<span class="hljs-number">000</span> shortfall. How would you like to proceed?<span class="hljs-string">"</span>
-        </code></pre>
-            <h3 id="test-5-multi-step-reasoning">Test 5: Multi-Step Reasoning</h3>
-            <pre><code><span class="hljs-string">SCENARIO:</span>
-        <span class="hljs-string">User:</span> <span class="hljs-string">"Email me a summary of my Q1 spending"</span>
-        
-        Available <span class="hljs-string">functions:</span>
-        - get_transactions(start_date, end_date, user_id)
-        - calculate_summary(transactions, grouping)
-        - generate_report(summary, format)
-        - send_email(recipient, subject, body, attachments)
-        
-        CORRECT <span class="hljs-string">SEQUENCE:</span>
-        <span class="hljs-number">1.</span> get_transactions(<span class="hljs-string">start_date:</span> <span class="hljs-string">"2025-01-01"</span>, <span class="hljs-string">end_date:</span> <span class="hljs-string">"2025-03-31"</span>, <span class="hljs-string">user_id:</span> <span class="hljs-string">"..."</span>)
-        <span class="hljs-number">2.</span> calculate_summary(<span class="hljs-string">transactions:</span> [...], <span class="hljs-string">grouping:</span> <span class="hljs-string">"category"</span>)
-        <span class="hljs-number">3.</span> generate_report(<span class="hljs-string">summary:</span> {...}, <span class="hljs-string">format:</span> <span class="hljs-string">"html"</span>)
-        <span class="hljs-number">4.</span> send_email(<span class="hljs-string">recipient:</span> <span class="hljs-string">"user@example.com"</span>, <span class="hljs-string">subject:</span> <span class="hljs-string">"Q1 Spending Summary"</span>, <span class="hljs-string">body:</span> <span class="hljs-string">"..."</span>, <span class="hljs-string">attachments:</span> [<span class="hljs-string">"report.html"</span>])
-        
-        WRONG <span class="hljs-string">SEQUENCE:</span> 
-        - Calling send_email first (no content yet)
-        - Skipping calculate_summary (need aggregated data)
-        - Not using user<span class="hljs-string">'s email address</span>
-        </code></pre>
-            <hr>
-            <h2 id="part-11-preparation-strategies">Part 11: Preparation Strategies</h2>
-            <h3 id="1-study-the-function-definitions">1. Study the Function Definitions</h3>
-            <p>Before any test:</p>
-            <ul>
-                <li>Read each function&#39;s description carefully</li>
-                <li>Understand what each parameter means</li>
-                <li>Note required vs. optional parameters</li>
-                <li>Check for enum constraints and data types</li>
-            </ul>
-            <h3 id="2-practice-tool-identification">2. Practice Tool Identification</h3>
-            <ul>
-                <li>Understand the semantic difference between similar tools<ul>
-                        <li><code>reset_password</code> vs <code>change_password</code></li>
-                        <li><code>search_products</code> vs <code>get_product</code></li>
-                        <li><code>update_profile</code> vs <code>change_settings</code></li>
-                    </ul>
-                </li>
-                <li>Look for key words in the request that indicate which tool</li>
-            </ul>
-            <h3 id="3-master-parameter-extraction">3. Master Parameter Extraction</h3>
-            <ul>
-                <li>Identify what information is explicitly stated</li>
-                <li>Infer reasonable defaults</li>
-                <li>Recognize what&#39;s missing</li>
-                <li>Know when to ask vs. when to assume</li>
-            </ul>
-            <h3 id="4-learn-data-type-conventions">4. Learn Data Type Conventions</h3>
-            <ul>
-                <li>Dates: ISO 8601 format (YYYY-MM-DD)</li>
-                <li>Times: 24-hour format (HH:MM:SS)</li>
-                <li>Decimals: Use . not , (1500.50 not 1500,50)</li>
-                <li>Booleans: true/false, not &quot;true&quot;/&quot;false&quot; or 1/0</li>
-                <li>Arrays: [] with comma-separated items</li>
-                <li>Objects: {key: value} with proper nesting</li>
-            </ul>
-            <h3 id="5-develop-error-intuition">5. Develop Error Intuition</h3>
-            <ul>
-                <li>Recognize when parameters are contradictory</li>
-                <li>Spot when required info is missing</li>
-                <li>Understand system limitations</li>
-                <li>Plan for failures</li>
-            </ul>
-            <h3 id="6-practice-real-scenarios">6. Practice Real Scenarios</h3>
-            <ul>
-                <li>Work through multi-step workflows</li>
-                <li>Practice sequential and parallel calls</li>
-                <li>Handle edge cases</li>
-                <li>Explain your reasoning clearly</li>
-            </ul>
-            <hr>
-            <h2 id="part-12-quick-reference-checklist">Part 12: Quick Reference Checklist</h2>
-            <h3 id="before-constructing-a-function-call-">Before Constructing a Function Call:</h3>
-            <ul>
-                <li>[ ] Have I identified the correct tool?</li>
-                <li>[ ] Do I understand what the tool does?</li>
-                <li>[ ] Have I identified all required parameters?</li>
-                <li>[ ] Are there any optional parameters I should include?</li>
-                <li>[ ] Do I have values for all required parameters?</li>
-                <li>[ ] What will I do if I&#39;m missing information?</li>
-                <li>[ ] Are my parameter values in the right data type?</li>
-                <li>[ ] Are my parameter values in the right format?</li>
-                <li>[ ] Have I checked for enum constraints?</li>
-                <li>[ ] Does this make sense given the context?</li>
-            </ul>
-            <h3 id="after-constructing-the-payload-">After Constructing the Payload:</h3>
-            <ul>
-                <li>[ ] Is the JSON valid and well-formatted?</li>
-                <li>[ ] Are all required parameters present?</li>
-                <li>[ ] Are there any typos in parameter names?</li>
-                <li>[ ] Are string values properly quoted?</li>
-                <li>[ ] Are numbers not quoted?</li>
-                <li>[ ] Are arrays and objects properly formatted?</li>
-                <li>[ ] Does the payload match the function definition?</li>
-            </ul>
-            <hr>
-            <h2 id="conclusion">Conclusion</h2>
-            <p>Function calling tests evaluate your ability to:</p>
-            <ol>
-                <li><strong>Understand semantics</strong>: Recognize what the user really wants</li>
-                <li><strong>Identify tools</strong>: Choose the right function for the job</li>
-                <li><strong>Extract parameters</strong>: Find and format the right data</li>
-                <li><strong>Handle complexity</strong>: Deal with missing info, errors, and multi-step flows</li>
-                <li><strong>Think systematically</strong>: Reason through the entire workflow</li>
-            </ol>
-            <p>Master these skills, and you&#39;ll excel at function calling tests. The key is practice and
-                understanding the
-                principles deeply rather than memorizing examples.</p>
-            <p><strong>Good luck with your assessment!</strong></p>
+        </section>
 
-        </article>
+        <!-- Section 2: Core Concepts -->
+        <section id="core-concepts">
+            <h2>2️⃣ Core Concepts</h2>
+
+            <h3>A. Tool Definition</h3>
+            <p>Every tool has three essential components:</p>
+            <pre><code>Tool Name: weather_fetch
+Purpose: Get current weather for a location
+Parameters: latitude, longitude, location_name</code></pre>
+
+            <h3>B. Function Call Structure</h3>
+            <p>A complete function call includes:</p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Purpose</th>
+                        <th>Example</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><strong>Tool Name</strong></td>
+                        <td>Identifies which tool to use</td>
+                        <td><code>weather_fetch</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Parameters</strong></td>
+                        <td>Input data the tool needs</td>
+                        <td><code>latitude: 48.8566, longitude: 2.3522</code></td>
+                    </tr>
+                    <tr>
+                        <td><strong>Values</strong></td>
+                        <td>Actual data for parameters</td>
+                        <td><code>location_name: "Paris, France"</code></td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>C. Parameter Types</h3>
+            <p><strong>Required Parameters</strong> (must always include):</p>
+            <ul>
+                <li>Authentication details</li>
+                <li>Core identifiers</li>
+                <li>Primary search terms</li>
+            </ul>
+
+            <p><strong>Optional Parameters</strong> (include when needed):</p>
+            <ul>
+                <li>Filters</li>
+                <li>Format preferences</li>
+                <li>Advanced options</li>
+            </ul>
+
+            <p><strong>Example:</strong></p>
+            <pre><code>Tool: places_search
+Required: query (what to search for)
+Optional: max_results (how many to return)
+         location_bias_lat, location_bias_lng (where to search)</code></pre>
+        </section>
+
+        <!-- Section 3: Tool Selection -->
+        <section id="tool-selection">
+            <h2>🎯 3️⃣ Tool Selection Strategy</h2>
+
+            <h3>Step 1: Understand the User's Need</h3>
+            <p>Ask yourself: <span class="highlight">What action does the user want?</span></p>
+            <table>
+                <thead>
+                    <tr>
+                        <th>User Request</th>
+                        <th>Action Type</th>
+                        <th>Category</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>"Find restaurants in Tokyo"</td>
+                        <td>Search for locations</td>
+                        <td>Places/Search</td>
+                    </tr>
+                    <tr>
+                        <td>"What's the weather?"</td>
+                        <td>Get current data</td>
+                        <td>Weather/Data</td>
+                    </tr>
+                    <tr>
+                        <td>"Call my assistant"</td>
+                        <td>Send message</td>
+                        <td>Communication</td>
+                    </tr>
+                    <tr>
+                        <td>"Show me on a map"</td>
+                        <td>Display locations visually</td>
+                        <td>Visualization</td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <h3>Step 2: Match to Available Tools</h3>
+            <p>Create a mental checklist:</p>
+            <pre><code>❓ Does this need real-time data? → Use fetch/search tools
+❓ Does this need to show locations? → Use map tools
+❓ Does this need to send information? → Use communication tools
+❓ Does this need to display something? → Use visualization tools</code></pre>
+
+            <h3>Step 3: Verify Tool Capability</h3>
+            <p><strong>NOT appropriate to use a tool for:</strong></p>
+            <ul>
+                <li>Questions answerable from general knowledge</li>
+                <li>Tasks the tool wasn't designed for</li>
+                <li>Requests requiring authentication you don't have</li>
+            </ul>
+
+            <div class="comparison">
+                <div class="comparison-item wrong">
+                    <div class="comparison-label">❌ Wrong Choice</div>
+                    <p><strong>Q:</strong> "What is photosynthesis?"</p>
+                    <p style="margin-bottom: 0;"><strong>Tool:</strong> Call biology_database tool</p>
+                </div>
+                <div class="comparison-item correct">
+                    <div class="comparison-label">✓ Correct</div>
+                    <p style="margin-bottom: 0;"><strong>A:</strong> Answer directly from knowledge</p>
+                </div>
+            </div>
+
+            <div class="comparison">
+                <div class="comparison-item wrong">
+                    <div class="comparison-label">❌ Wrong Choice</div>
+                    <p><strong>Q:</strong> "What's the current Bitcoin price?"</p>
+                    <p style="margin-bottom: 0;"><strong>Tool:</strong> Use your training data ("Bitcoin was...")</p>
+                </div>
+                <div class="comparison-item correct">
+                    <div class="comparison-label">✓ Correct</div>
+                    <p style="margin-bottom: 0;"><strong>A:</strong> Call crypto_price tool (has real-time data)</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 4: Payload Construction -->
+        <section id="payload-construction">
+            <h2>🔧 4️⃣ Payload Construction</h2>
+
+            <h3>A. Payload Anatomy</h3>
+            <p>A payload is the data you send to a tool:</p>
+            <pre><code>{
+  "tool_name": "weather_fetch",
+  "parameters": {
+    "latitude": 48.8566,
+    "longitude": 2.3522,
+    "location_name": "Paris, France"
+  }
+}</code></pre>
+
+            <h3>B. Parameter Rules</h3>
+
+            <div class="card warning">
+                <h4>Rule 1: Type Matching</h4>
+                <div class="comparison">
+                    <div class="comparison-item wrong">
+                        <div class="comparison-label">❌ Wrong</div>
+                        <p>Parameter expects: Number</p>
+                        <p style="margin-bottom: 0;">Your value: <code>"48.8566"</code> (string)</p>
+                    </div>
+                    <div class="comparison-item correct">
+                        <div class="comparison-label">✓ Correct</div>
+                        <p>Parameter expects: Number</p>
+                        <p style="margin-bottom: 0;">Your value: <code>48.8566</code> (number)</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card warning">
+                <h4>Rule 2: Required vs Optional</h4>
+                <div class="comparison">
+                    <div class="comparison-item wrong">
+                        <div class="comparison-label">❌ Missing Required</div>
+                        <p style="margin-bottom: 0;"><code>weather_fetch(location_name: "Paris")</code></p>
+                    </div>
+                    <div class="comparison-item correct">
+                        <div class="comparison-label">✓ Complete</div>
+                        <p style="margin-bottom: 0;"><code>weather_fetch(location_name: "Paris", latitude: 48.8566, longitude: 2.3522)</code></p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card warning">
+                <h4>Rule 3: Enum Values</h4>
+                <p>Some parameters only accept specific values:</p>
+                <div class="comparison">
+                    <div class="comparison-item wrong">
+                        <div class="comparison-label">❌ Invalid Value</div>
+                        <p style="margin-bottom: 0;"><code>travel_mode: "car"</code></p>
+                    </div>
+                    <div class="comparison-item correct">
+                        <div class="comparison-label">✓ Valid Value</div>
+                        <p style="margin-bottom: 0;"><code>travel_mode: "driving"</code></p>
+                    </div>
+                </div>
+                <p style="margin-top: 1rem; margin-bottom: 0;">Accepted: "driving", "walking", "transit", "bicycling"</p>
+            </div>
+
+            <h3>C. Payload Construction Examples</h3>
+
+            <div class="example">
+                <div class="example-title">Example 1: Simple Search</div>
+                <p><strong>User:</strong> "Find coffee shops in Bangkok"</p>
+                <p><strong>Tool:</strong> places_search</p>
+                <pre><code>{
+  "queries": [
+    {
+      "query": "coffee shops Bangkok",
+      "max_results": 5
+    }
+  ]
+}</code></pre>
+            </div>
+
+            <div class="example">
+                <div class="example-title">Example 2: Complex Multi-Parameter</div>
+                <p><strong>User:</strong> "Show me luxury hotels in Bali with 3-star rating within 10km"</p>
+                <p><strong>Tool:</strong> places_search</p>
+                <pre><code>{
+  "queries": [
+    {
+      "query": "luxury hotels Bali 3-star",
+      "max_results": 8
+    }
+  ],
+  "location_bias_lat": -8.6500,
+  "location_bias_lng": 115.2167,
+  "location_bias_radius": 10000
+}</code></pre>
+            </div>
+        </section>
+
+        <!-- Section 5: Common Mistakes -->
+        <section id="common-mistakes">
+            <h2>⚠️ 5️⃣ Common Mistakes to Avoid</h2>
+
+            <div class="card danger">
+                <h4>Mistake 1: Wrong Tool for the Job</h4>
+                <div class="comparison-item wrong">
+                    <p><strong>❌</strong> User: "How many people live in Tokyo?"<br>Tool Used: places_search<br>Issue: Finds locations, not population data</p>
+                </div>
+                <div class="comparison-item correct" style="margin-top: 0.5rem;">
+                    <p><strong>✓</strong> Correct: Use web_search or general knowledge</p>
+                </div>
+            </div>
+
+            <div class="card danger">
+                <h4>Mistake 2: Missing Required Parameters</h4>
+                <div class="comparison-item wrong">
+                    <p><strong>❌</strong> Tool: fetch_sports_data<br>Payload: <code>{ data_type: "scores" }</code><br>Issue: Missing "league" parameter</p>
+                </div>
+                <div class="comparison-item correct" style="margin-top: 0.5rem;">
+                    <p><strong>✓</strong> Correct Payload:</p>
+                    <pre><code>{
+  "data_type": "scores",
+  "league": "nba"
+}</code></pre>
+                </div>
+            </div>
+
+            <div class="card danger">
+                <h4>Mistake 3: Wrong Data Type</h4>
+                <div class="comparison-item wrong">
+                    <p style="margin-bottom: 0;"><strong>❌</strong> <code>web_search(query: 12345)</code><br>Issue: query expects string, not number</p>
+                </div>
+                <div class="comparison-item correct" style="margin-top: 0.5rem;">
+                    <p style="margin-bottom: 0;"><strong>✓</strong> <code>web_search(query: "12345")</code></p>
+                </div>
+            </div>
+
+            <div class="card danger">
+                <h4>Mistake 4: Invalid Enum Value</h4>
+                <div class="comparison-item wrong">
+                    <p style="margin-bottom: 0;"><strong>❌</strong> <code>places_map(travel_mode: "car")</code><br>Issue: "car" not in accepted values</p>
+                </div>
+                <div class="comparison-item correct" style="margin-top: 0.5rem;">
+                    <p style="margin-bottom: 0;"><strong>✓</strong> <code>places_map(travel_mode: "driving")</code></p>
+                </div>
+            </div>
+
+            <div class="card danger">
+                <h4>Mistake 5: Over-engineering Simple Questions</h4>
+                <div class="comparison-item wrong">
+                    <p><strong>❌</strong> User: "What's 2+2?"<br>Action: Call calculator_tool<br>Issue: Basic math, answer directly</p>
+                </div>
+                <div class="comparison-item correct" style="margin-top: 0.5rem;">
+                    <p><strong>✓</strong> Correct: Answer "4" directly</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 6: Practice Examples -->
+        <section id="practice-examples">
+            <h2>💡 6️⃣ Practice Examples</h2>
+
+            <h3>Example 1: Weather Query</h3>
+            <p><strong>Question:</strong> "Is it raining in Singapore right now?"</p>
+            <div class="steps">
+                <div class="step">
+                    <p><strong>Understand Need:</strong></p>
+                    <ul style="margin: 0;">
+                        <li>Need current weather data</li>
+                        <li>Real-time information required</li>
+                    </ul>
+                </div>
+                <div class="step">
+                    <p><strong>Select Tool:</strong></p>
+                    <p style="margin: 0;">→ <code>weather_fetch</code> (designed for current weather)</p>
+                </div>
+                <div class="step">
+                    <p><strong>Construct Payload:</strong></p>
+                    <pre><code>{
+  "tool": "weather_fetch",
+  "parameters": {
+    "location_name": "Singapore",
+    "latitude": 1.3521,
+    "longitude": 103.8198
+  }
+}</code></pre>
+                </div>
+                <div class="step">
+                    <p><strong>Interpret Result:</strong></p>
+                    <ul style="margin: 0;">
+                        <li>If result includes "rain": "Yes, it's raining"</li>
+                        <li>If no rain: "No rain currently, it's clear/cloudy"</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Example 2: Location Search & Display</h3>
+            <p><strong>Question:</strong> "Show me the top 3 coffee shops near my hotel in Kyoto on a map"</p>
+            <div class="card success">
+                <p><strong>Note:</strong> This requires TWO tools: places_search + places_map_display_v0</p>
+            </div>
+            <div class="steps">
+                <div class="step">
+                    <p><strong>First Call - Search Payload:</strong></p>
+                    <pre><code>{
+  "queries": [
+    {
+      "query": "coffee shops Kyoto",
+      "max_results": 3
+    }
+  ],
+  "location_bias_lat": 35.0116,
+  "location_bias_lng": 135.7681
+}</code></pre>
+                </div>
+                <div class="step">
+                    <p><strong>Second Call - Map Payload:</strong></p>
+                    <pre><code>{
+  "locations": [
+    {
+      "name": "Coffee Shop A",
+      "latitude": 35.0150,
+      "longitude": 135.7700,
+      "place_id": "ChIJ...",
+      "notes": "Cozy atmosphere, free WiFi"
+    },
+    {
+      "name": "Coffee Shop B",
+      "latitude": 35.0120,
+      "longitude": 135.7680,
+      "place_id": "ChIJ...",
+      "notes": "Traditional Japanese cafe"
+    },
+    {
+      "name": "Coffee Shop C",
+      "latitude": 35.0100,
+      "longitude": 135.7650,
+      "place_id": "ChIJ...",
+      "notes": "Modern roastery"
+    }
+  ]
+}</code></pre>
+                </div>
+            </div>
+
+            <h3>Example 3: Sports Data</h3>
+            <p><strong>Question:</strong> "What was the final score of yesterday's NBA game between Lakers and Celtics?"</p>
+            <div class="steps">
+                <div class="step">
+                    <p><strong>Understand Need:</strong></p>
+                    <ul style="margin: 0;">
+                        <li>Recent sports data</li>
+                        <li>Specific game score</li>
+                    </ul>
+                </div>
+                <div class="step">
+                    <p><strong>Select Tool:</strong></p>
+                    <p style="margin: 0;">→ <code>fetch_sports_data</code></p>
+                </div>
+                <div class="step">
+                    <p><strong>Construct Payload:</strong></p>
+                    <pre><code>{
+  "data_type": "scores",
+  "league": "nba",
+  "team": "Lakers"
+}</code></pre>
+                </div>
+            </div>
+        </section>
+
+        <!-- Section 7: Assessment Strategy -->
+        <section id="assessment-strategy">
+            <h2>🎓 7️⃣ Assessment Strategy</h2>
+
+            <h3>Before Attempting a Question</h3>
+            <p><strong>Use this checklist:</strong></p>
+            <ul class="checklist">
+                <li>Read the question completely</li>
+                <li>Identify what the user actually wants (not what they said)</li>
+                <li>List all available tools in your mind</li>
+                <li>Eliminate tools that don't fit</li>
+                <li>Verify required parameters</li>
+                <li>Check parameter data types</li>
+                <li>Confirm enum values (if applicable)</li>
+                <li>Review your payload once more</li>
+            </ul>
+
+            <h3>During Question Solving</h3>
+            <div class="steps">
+                <div class="step">
+                    <p><strong>Analyze the Request</strong></p>
+                    <p style="margin-bottom: 0.5rem;">Question: "Show me a map of tourist attractions in Barcelona"</p>
+                    <ul style="margin: 0;">
+                        <li>User wants: Visual map display</li>
+                        <li>Of what: Tourist attractions</li>
+                        <li>Where: Barcelona</li>
+                        <li>Action: Show/display</li>
+                    </ul>
+                </div>
+                <div class="step">
+                    <p><strong>Identify the Core Need</strong></p>
+                    <ul style="margin: 0;">
+                        <li>Core Need: Display locations on a map</li>
+                        <li>Potential Tools: places_search, places_map_display_v0</li>
+                        <li>First step: Search for attractions (places_search)</li>
+                        <li>Second step: Display on map (places_map_display_v0)</li>
+                    </ul>
+                </div>
+                <div class="step">
+                    <p><strong>Double-Check</strong></p>
+                    <ul style="margin: 0;">
+                        <li>✓ Are all required parameters included?</li>
+                        <li>✓ Are data types correct?</li>
+                        <li>✓ Are enum values valid?</li>
+                        <li>✓ Does this actually solve the user's problem?</li>
+                    </ul>
+                </div>
+            </div>
+
+            <h3>Common Assessment Traps</h3>
+
+            <div class="card warning">
+                <h4>Trap 1: Red Herring Information</h4>
+                <p><strong>Question:</strong> "I'm in New York and want to find restaurants that serve sushi and cost less than $20. I have a gluten allergy. Show them on a map."</p>
+                <p><strong>Red Herring:</strong> "I have a gluten allergy"</p>
+                <ul style="margin: 0;">
+                    <li>Places search tool can't filter by allergies</li>
+                    <li>Include in conversation context, not in tool payload</li>
+                </ul>
+                <p style="margin-top: 0.5rem;"><strong>Real Requirements:</strong></p>
+                <ul style="margin: 0;">
+                    <li>query: "sushi restaurants under $20 New York"</li>
+                    <li>location: New York</li>
+                    <li>action: Display on map</li>
+                </ul>
+            </div>
+
+            <div class="card warning">
+                <h4>Trap 2: Overthinking</h4>
+                <p><strong>Question:</strong> "What's 2+2?"</p>
+                <p><strong>Overthinking:</strong> "Should I call a calculation tool?"</p>
+                <p style="margin-bottom: 0;"><strong>✓ Correct:</strong> Answer directly - no tool needed</p>
+            </div>
+
+            <div class="card warning">
+                <h4>Trap 3: Wrong Tool Assumption</h4>
+                <p><strong>Question:</strong> "Create a presentation about climate change"</p>
+                <p><strong>Assumption:</strong> "I need a pptx tool"</p>
+                <p style="margin-bottom: 0;"><strong>✓ Correct:</strong> Create_file with HTML or markdown, OR use visualization tools (depends on what's available)</p>
+            </div>
+
+            <h3>Final Assessment Tips</h3>
+
+            <div class="card success">
+                <h4>Tip 1: Read Once, Understand Twice</h4>
+                <ul style="margin: 0;">
+                    <li>First read: Get the gist</li>
+                    <li>Second read: Catch specific requirements</li>
+                </ul>
+            </div>
+
+            <div class="card success">
+                <h4>Tip 2: Map to One Tool = Simplicity</h4>
+                <ul style="margin: 0;">
+                    <li>If multiple tools needed, sequence them</li>
+                    <li>Each tool has one clear job</li>
+                    <li>Chain results from one to the next</li>
+                </ul>
+            </div>
+
+            <div class="card success">
+                <h4>Tip 3: Validate Against Requirements</h4>
+                <ul style="margin: 0;">
+                    <li>✓ Does the tool exist? (Name it)</li>
+                    <li>✓ Can the tool do this? (Describe capability)</li>
+                    <li>✓ Are parameters provided/inferable? (List them)</li>
+                    <li>✓ Are parameter values correct type? (Verify)</li>
+                    <li>✓ Is result meaningful to the user? (Final check)</li>
+                </ul>
+            </div>
+
+            <div class="card danger">
+                <h4>Tip 4: One Attempt = One Chance</h4>
+                <ul style="margin: 0;">
+                    <li>Use the checklist before submitting</li>
+                    <li>No second attempt possible</li>
+                    <li>Precision over speed</li>
+                </ul>
+            </div>
+        </section>
+
+        <!-- Quick Reference Section -->
+        <section>
+            <h2>📖 Quick Reference: Common Tool Categories</h2>
+
+            <h3>Data Retrieval Tools</h3>
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h4>web_search</h4>
+                    <p>General web information</p>
+                </div>
+                <div class="tool-card">
+                    <h4>fetch_sports_data</h4>
+                    <p>Sports scores, standings</p>
+                </div>
+                <div class="tool-card">
+                    <h4>weather_fetch</h4>
+                    <p>Current weather</p>
+                </div>
+                <div class="tool-card">
+                    <h4>places_search</h4>
+                    <p>Locations, restaurants, attractions</p>
+                </div>
+            </div>
+
+            <h3>Visualization Tools</h3>
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h4>places_map_display_v0</h4>
+                    <p>Show locations on map</p>
+                </div>
+                <div class="tool-card">
+                    <h4>visualize:show_widget</h4>
+                    <p>Display charts, diagrams</p>
+                </div>
+                <div class="tool-card">
+                    <h4>recipe_display_v0</h4>
+                    <p>Interactive recipes</p>
+                </div>
+            </div>
+
+            <h3>Communication Tools</h3>
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h4>message_compose_v1</h4>
+                    <p>Draft emails, messages</p>
+                </div>
+                <div class="tool-card">
+                    <h4>recommend_claude_apps</h4>
+                    <p>Suggest tools</p>
+                </div>
+            </div>
+
+            <h3>File & Content Tools</h3>
+            <div class="tool-grid">
+                <div class="tool-card">
+                    <h4>create_file</h4>
+                    <p>Generate new files</p>
+                </div>
+                <div class="tool-card">
+                    <h4>str_replace</h4>
+                    <p>Edit existing files</p>
+                </div>
+                <div class="tool-card">
+                    <h4>present_files</h4>
+                    <p>Share files with user</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Key Takeaway -->
+        <section style="background: linear-gradient(135deg, #f0f9ff 0%, #f3e8ff 100%); border-radius: 12px;">
+            <h2 style="border: none; padding-bottom: 0; color: var(--primary);">🎯 Key Takeaway Formula</h2>
+            <pre style="background: transparent; color: var(--text); border-left: 4px solid var(--primary);"><code>TOOL SELECTION = Match user need to tool capability
+PAYLOAD CONSTRUCTION = Provide required parameters with correct types
+SUCCESS = User gets exactly what they asked for</code></pre>
+            <p style="margin-top: 1.5rem; font-size: 1.05rem;"><strong>Remember:</strong> <span style="color: var(--danger);">Precision > Creativity</span>. <span style="color: var(--success);">Correctness > Cleverness.</span></p>
+        </section>
+
+        <!-- Final Message -->
+        <section style="background: var(--primary); color: white; text-align: center;">
+            <h2 style="color: white; border-color: white;">🚀 Ready for Your Assessment?</h2>
+            <p style="color: white; font-size: 1.05rem;">You have all the tools you need. Trust your checklist. Go ace it! 💪</p>
+        </section>
     </main>
 
     <footer>
-        <small>Prepared by <a class="link" target="_blank" href="https://www.linkedin.com/in/azhar-uddin-sunny">Azhar
-                Uddin</a></small>
+        <p><strong>Function Calling Tutorial - Complete Guide</strong></p>
+        <p>Master the essentials for one-attempt assessment success</p>
+        <p style="margin-top: 1rem; font-size: 0.9rem;">Good luck on your assessment! 🎓</p>
     </footer>
-
-    <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-    <script src="main.js"></script>
 </body>
-
 </html>
